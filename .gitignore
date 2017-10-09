@@ -287,5 +287,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-appsetting.Development.json
-
+/SecretsRUs/appsettings.Development.json
