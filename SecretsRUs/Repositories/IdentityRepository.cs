@@ -23,7 +23,7 @@ namespace SecretsRUs.Repositories
         public List<string> Read()
         {
             var results = new List<string>();
-            using (var connection = new SqlConnection("Server=LT004447\\SQLEXPRESS;Database=SecretsRUs;Trusted_Connection=True;"))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 var query = "select name from Test";
                 var command = new SqlCommand(query, connection);
@@ -46,7 +46,7 @@ namespace SecretsRUs.Repositories
 
         public void Add(string name)
         {
-            using (var connection = new SqlConnection("Server=LT004447\\SQLEXPRESS;Database=SecretsRUs;Trusted_Connection=True;"))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 var query = $"insert into Test (Name) Values ('{name}')";
                 var command = new SqlCommand(query, connection);
@@ -64,13 +64,58 @@ namespace SecretsRUs.Repositories
 
         public ApplicationUser FindByName(string name)
         {
-            return null;
+            ApplicationUser results = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"select Id, Username, PasswordHash from Users where Users.Username = '{name}'";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        results = new ApplicationUser();
+                        results.Id = reader[0].ToString();
+                        results.UserName = reader[1].ToString();
+                        results.NormalizedUserName = results.UserName;
+                        results.PasswordHash = reader[2].ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return results;
         }
 
         public bool Create(ApplicationUser user)
         {
-            //throw new NotImplementedException();
-            return true;
+            var result = false;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"insert into Users (Id, Username, PasswordHash) Values ('{user.Id}', '{user.UserName}', '{user.PasswordHash}')";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    if (command.ExecuteNonQuery() == 1)
+                    {
+                        result = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return result;
         }
+
     }
 }
