@@ -9,6 +9,7 @@ namespace SecretsRUs.Repositories
     public interface IIdentityRepository
     {
         ApplicationUser FindByName(string name);
+        ApplicationUser FindById(string userId);
         bool Create(ApplicationUser user);
     }
 }

@@ -92,6 +92,36 @@ namespace SecretsRUs.Repositories
             return results;
         }
 
+        public ApplicationUser FindById(string userId)
+        {
+            ApplicationUser results = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"select Id, Username, PasswordHash from Users where Users.Id = '{userId}'";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        results = new ApplicationUser();
+                        results.Id = reader[0].ToString();
+                        results.UserName = reader[1].ToString();
+                        results.NormalizedUserName = results.UserName;
+                        results.PasswordHash = reader[2].ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return results;
+        }
+
         public bool Create(ApplicationUser user)
         {
             var result = false;
