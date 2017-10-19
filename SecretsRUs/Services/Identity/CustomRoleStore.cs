@@ -5,11 +5,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using SecretsRUs.Repositories;
 
 namespace SecretsRUs.Services.Identity
 {
     public class CustomRoleStore : IRoleStore<ApplicationRole>
     {
+        private bool _disposed = false;
+        private IIdentityRepository _repository;
+
+        public CustomRoleStore(IIdentityRepository repository)
+        {
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+
+            _repository = repository;
+        }
+
         public Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -22,12 +36,19 @@ namespace SecretsRUs.Services.Identity
 
         public void Dispose()
         {
-            //throw new NotImplementedException();
+            _disposed = true;
         }
 
         public Task<ApplicationRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (roleId == null)
+            {
+                throw new ArgumentNullException(nameof(roleId));
+            }
+
+            return Task.FromResult(_repository.FindRoleById(roleId));
         }
 
         public Task<ApplicationRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
@@ -64,5 +85,14 @@ namespace SecretsRUs.Services.Identity
         {
             throw new NotImplementedException();
         }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
+        }
+
     }
 }

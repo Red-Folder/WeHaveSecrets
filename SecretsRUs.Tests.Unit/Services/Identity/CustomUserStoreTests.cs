@@ -596,5 +596,67 @@ namespace SecretsRUs.Tests.Unit.Services.Identity
             );
         }
 
+        [Fact]
+        public async void AddToRoleAsyncThrowsNotImplementedException()
+        {
+            var user = new ApplicationUser();
+            var roleName = "TEST";
+            var cancellationToken = new CancellationToken();
+            var sut = new CustomUserRoleStore();
+
+            await Assert.ThrowsAsync<NotImplementedException>(() =>
+                sut.AddToRoleAsync(user, roleName, cancellationToken)
+            );
+        }
+
+        [Fact]
+        public async void GetRolesAsyncThrowsNotImplementedException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var sut = new CustomUserRoleStore();
+
+            await Assert.ThrowsAsync<NotImplementedException>(() =>
+                sut.GetRolesAsync(user, cancellationToken)
+            );
+        }
+
+        [Fact]
+        public async void GetUsersInRoleAsyncThrowsNotImplementedException()
+        {
+            var roleName = "TEST";
+            var cancellationToken = new CancellationToken();
+            var sut = new CustomUserRoleStore();
+
+            await Assert.ThrowsAsync<NotImplementedException>(() =>
+                sut.GetUsersInRoleAsync(roleName, cancellationToken)
+            );
+        }
+
+        [Fact]
+        public async void IsInRoleAsyncThrowsNotImplementedException()
+        {
+            var user = new ApplicationUser();
+            var roleName = "TEST";
+            var cancellationToken = new CancellationToken();
+            var sut = new CustomUserRoleStore();
+
+            await Assert.ThrowsAsync<NotImplementedException>(() =>
+                sut.IsInRoleAsync(user, roleName, cancellationToken)
+            );
+        }
+
+        [Fact]
+        public async void RemoveFromRoleAsyncThrowsNotImplementedException()
+        {
+            var user = new ApplicationUser();
+            var roleName = "TEST";
+            var cancellationToken = new CancellationToken();
+            var sut = new CustomUserRoleStore();
+
+            await Assert.ThrowsAsync<NotImplementedException>(() =>
+                sut.RemoveFromRoleAsync(user, roleName, cancellationToken)
+            );
+        }
     }
 }
