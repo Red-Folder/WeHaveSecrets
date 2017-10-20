@@ -654,55 +654,250 @@ namespace SecretsRUs.Tests.Unit.Services.Identity
             Assert.Equal(IdentityResult.Success, await sut.UpdateAsync(user, cancellationToken));
         }
 
+        #region AddToRoleAsync
         [Fact]
-        public async void AddToRoleAsyncThrowsNotImplementedException()
+        public async void AddToRoleAsyncWithoutUserThrowsArgumentNullException()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.AddToRoleAsync(null, "TEST", cancellationToken)
+            );
+
+            Assert.Contains("user", ex.Message);
+        }
+
+        [Fact]
+        public async void AddToRoleAsyncWithoutRoleNameThrowsArgumentNullException()
         {
             var user = new ApplicationUser();
-            var roleName = "TEST";
             var cancellationToken = new CancellationToken();
-            var sut = new CustomUserRoleStore();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
 
-            await Assert.ThrowsAsync<NotImplementedException>(() =>
-                sut.AddToRoleAsync(user, roleName, cancellationToken)
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.AddToRoleAsync(user, null, cancellationToken)
+            );
+
+            Assert.Contains("roleName", ex.Message);
+        }
+
+        [Fact]
+        public async void AddToRoleAsyncCancelledTokenThrowsException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken(true);
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
+                sut.AddToRoleAsync(user, "TEST", cancellationToken)
             );
         }
 
         [Fact]
-        public async void GetRolesAsyncThrowsNotImplementedException()
+        public async void AddToRoleAsyncIfDisposedThrowsObjectDisposedException()
         {
             var user = new ApplicationUser();
             var cancellationToken = new CancellationToken();
-            var sut = new CustomUserRoleStore();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+            sut.Dispose();
 
-            await Assert.ThrowsAsync<NotImplementedException>(() =>
+            var ex = await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+                sut.AddToRoleAsync(user, "TEST", cancellationToken)
+            );
+
+            Assert.Contains("CustomUserStore", ex.Message);
+        }
+
+        [Fact]
+        public async void AddToRoleAsyncReturnsNothingIfSaved()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await sut.AddToRoleAsync(user, "TEST", cancellationToken);
+        }
+        #endregion AddToRoleAsync
+
+        #region GetRolesAsync
+        [Fact]
+        public async void GetRolesAsyncWithoutUserThrowsArgumentNullException()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.GetRolesAsync(null, cancellationToken)
+            );
+
+            Assert.Contains("user", ex.Message);
+        }
+
+        [Fact]
+        public async void GetRolesAsyncCancelledTokenThrowsException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken(true);
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
                 sut.GetRolesAsync(user, cancellationToken)
             );
         }
+
+        [Fact]
+        public async void GetRolesAsyncIfDisposedThrowsObjectDisposedException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+            sut.Dispose();
+
+            var ex = await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+                sut.GetRolesAsync(user, cancellationToken)
+            );
+
+            Assert.Contains("CustomUserStore", ex.Message);
+        }
+
+        [Fact]
+        public async void GetRolesAsyncReturnsListIfFound()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var list = new List<ApplicationRole>
+            {
+                new ApplicationRole { Id = "TEST1"},
+                new ApplicationRole { Id = "TEST2"}
+            };
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.Create(It.IsAny<ApplicationUser>())).Returns(true);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var roles = await sut.GetRolesAsync(user, cancellationToken);
+            Assert.Equal(2, list.Count);
+        }
+
+        [Fact]
+        public async void GetRolesAsyncReturnsEmptyListIfNotFound()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var list = new List<ApplicationRole>();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.Create(It.IsAny<ApplicationUser>())).Returns(true);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var roles = await sut.GetRolesAsync(user, cancellationToken);
+            Assert.Empty(list);
+        }
+        #endregion GetRolesAsync
 
         [Fact]
         public async void GetUsersInRoleAsyncThrowsNotImplementedException()
         {
             var roleName = "TEST";
             var cancellationToken = new CancellationToken();
-            var sut = new CustomUserRoleStore();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
 
             await Assert.ThrowsAsync<NotImplementedException>(() =>
                 sut.GetUsersInRoleAsync(roleName, cancellationToken)
             );
         }
 
+        #region IsInRoleAsync
         [Fact]
-        public async void IsInRoleAsyncThrowsNotImplementedException()
+        public async void IsInRoleAsyncWithoutUserThrowsArgumentNullException()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.IsInRoleAsync(null, "TEST", cancellationToken)
+            );
+
+            Assert.Contains("user", ex.Message);
+        }
+
+        [Fact]
+        public async void IsInRoleAsyncWithoutRoleIdThrowsArgumentNullException()
         {
             var user = new ApplicationUser();
-            var roleName = "TEST";
             var cancellationToken = new CancellationToken();
-            var sut = new CustomUserRoleStore();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
 
-            await Assert.ThrowsAsync<NotImplementedException>(() =>
-                sut.IsInRoleAsync(user, roleName, cancellationToken)
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.IsInRoleAsync(user, null, cancellationToken)
+            );
+
+            Assert.Contains("roleName", ex.Message);
+        }
+
+        [Fact]
+        public async void IsInRoleAsyncCancelledTokenThrowsException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken(true);
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
+                sut.IsInRoleAsync(user, "TEST", cancellationToken)
             );
         }
+
+        [Fact]
+        public async void IsInRoleAsyncIfDisposedThrowsObjectDisposedException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+            sut.Dispose();
+
+            var ex = await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+                sut.IsInRoleAsync(user, "TEST", cancellationToken)
+            );
+
+            Assert.Contains("CustomUserStore", ex.Message);
+        }
+
+        [Fact]
+        public async void IsInRoleAsyncReturnsTrueIfFound()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.IsInRole(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            Assert.True(await sut.IsInRoleAsync(user, "TEST", cancellationToken));
+        }
+
+        [Fact]
+        public async void IsInRoleAsyncReturnsFalseIfNotFound()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.IsInRole(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            Assert.False(await sut.IsInRoleAsync(user, "TEST", cancellationToken));
+        }
+        #endregion IsInRoleAsync
 
         [Fact]
         public async void RemoveFromRoleAsyncThrowsNotImplementedException()
@@ -710,7 +905,8 @@ namespace SecretsRUs.Tests.Unit.Services.Identity
             var user = new ApplicationUser();
             var roleName = "TEST";
             var cancellationToken = new CancellationToken();
-            var sut = new CustomUserRoleStore();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
 
             await Assert.ThrowsAsync<NotImplementedException>(() =>
                 sut.RemoveFromRoleAsync(user, roleName, cancellationToken)
