@@ -20,48 +20,6 @@ namespace SecretsRUs.Repositories
             _connectionString = connectionString;
         }
         
-        public List<string> Read()
-        {
-            var results = new List<string>();
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var query = "select name from Test";
-                var command = new SqlCommand(query, connection);
-                try
-                {
-                    connection.Open();
-                    var reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        results.Add(reader[0].ToString());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-            }
-            return results;
-        }
-
-        public void Add(string name)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var query = $"insert into Test (Name) Values ('{name}')";
-                var command = new SqlCommand(query, connection);
-                try
-                {
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-            }
-        }
-
         public ApplicationUser FindByName(string name)
         {
             ApplicationUser results = null;

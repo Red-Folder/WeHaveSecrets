@@ -104,18 +104,77 @@ namespace SecretsRUs.Tests.Unit.Services.Identity
             );
         }
 
+        #region FindByIdAsync
         [Fact]
-        public async void FindByIdAsyncThrowsNotImplementedException()
+        public async void FindByIdAsyncWithoutUserThrowsArgumentNullException()
         {
-            var userId = Guid.NewGuid().ToString();
             var cancellationToken = new CancellationToken();
             var mockRepository = new Mock<IIdentityRepository>();
             var sut = new CustomUserStore(mockRepository.Object);
 
-            await Assert.ThrowsAsync<NotImplementedException>(() =>
-                sut.FindByIdAsync(userId, cancellationToken)
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.FindByIdAsync(null, cancellationToken)
+            );
+
+            Assert.Contains("userId", ex.Message);
+        }
+
+        [Fact]
+        public async void FindByIdAsyncCancelledTokenThrowsException()
+        {
+            var cancellationToken = new CancellationToken(true);
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
+                sut.FindByIdAsync("1234", cancellationToken)
             );
         }
+
+        [Fact]
+        public async void FindByIdAsyncIfDisposedThrowsObjectDisposedException()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+            sut.Dispose();
+
+            var ex = await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+                sut.FindByIdAsync("1234", cancellationToken)
+            );
+
+            Assert.Contains("CustomUserStore", ex.Message);
+        }
+
+        [Fact]
+        public async void FindByIdAsyncReturnsRoleIfFound()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.FindById(It.IsAny<string>())).Returns(new ApplicationUser
+            {
+                Id = "1234",
+                UserName = "TEST"
+            });
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var role = await sut.FindByIdAsync("1234", cancellationToken);
+            Assert.Equal("1234", role.Id);
+        }
+
+        [Fact]
+        public async void FindByIdAsyncReturnsNullIfNotFound()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.FindById(It.IsAny<string>())).Returns<ApplicationUser>(null);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            Assert.Null(await sut.FindByIdAsync("1234", cancellationToken));
+        }
+
+        #endregion FindByIdAsync
+
 
         [Fact]
         public async void FindByNameAsyncWithoutUserThrowsArgumentNullException()
@@ -584,16 +643,15 @@ namespace SecretsRUs.Tests.Unit.Services.Identity
         }
 
         [Fact]
-        public async void UpdateAsyncThrowsNotImplementedException()
+        public async void UpdateAsyncReturnsSuccess()
         {
             var user = new ApplicationUser();
             var cancellationToken = new CancellationToken();
             var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.Create(It.IsAny<ApplicationUser>())).Returns(true);
             var sut = new CustomUserStore(mockRepository.Object);
 
-            await Assert.ThrowsAsync<NotImplementedException>(() =>
-                sut.UpdateAsync(user, cancellationToken)
-            );
+            Assert.Equal(IdentityResult.Success, await sut.UpdateAsync(user, cancellationToken));
         }
 
         [Fact]
