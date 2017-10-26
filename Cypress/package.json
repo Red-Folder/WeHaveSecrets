@@ -1,0 +1,14 @@
+{
+  "name": "secretsrus-cypress-tests",
+  "version": "1.0.0",
+  "description": "Dependencies for running Cypress.io",
+  "scripts": {
+    "cypress:open": "cypress open",
+	"cypress" : "cypress run"
+  },
+  "author": "Red Folder Consultancy Ltd",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^1.0.2"
+  }
+}
