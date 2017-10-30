@@ -9,6 +9,6 @@ namespace SecretsRUs.Repositories
     public interface ISecretsRepository
     {
         List<Secret> GetAll(string userId);
-        void Save(string userId, Secret secret);
+        Secret Add(string userId, Secret secret);
     }
 }

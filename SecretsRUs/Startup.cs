@@ -7,6 +7,8 @@ using SecretsRUs.Models;
 using SecretsRUs.Services;
 using SecretsRUs.Services.Identity;
 using SecretsRUs.Repositories;
+using Microsoft.AspNetCore.Http;
+using SecretsRUs.Services.Secrets;
 
 namespace SecretsRUs
 {
@@ -31,6 +33,9 @@ namespace SecretsRUs
                 .AddDefaultTokenProviders();
             */
 
+            // HttpAccessor
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             // Add identity types
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddDefaultTokenProviders();
@@ -38,13 +43,26 @@ namespace SecretsRUs
             // Identity Services
             services.AddTransient<IUserStore<ApplicationUser>, CustomUserStore>();
             services.AddTransient<IRoleStore<ApplicationRole>, CustomRoleStore>();
+
+            // Repositories
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddTransient<IIdentityRepository>(e => new IdentityRepository(connectionString));
+            services.AddTransient<ISecretsRepository>(e => new SecretsRepository(connectionString));
+
+
             // TODO
             //services.AddTransient<DapperUsersTable>();
 
             // Add application services.
             //services.AddTransient<IEmailSender, EmailSender>();
+
+            // Build up the UserVault
+            // Built separely to allow for the UserId to be injected at creation via factory
+            services.AddTransient<ISecretVault>(x =>
+                new SecretVaultFactory(x.GetRequiredService<UserManager<ApplicationUser>>(),
+                                        x.GetRequiredService<IHttpContextAccessor>(),
+                                        x.GetRequiredService<ISecretsRepository>()).CreateVault()
+            );
 
             services.AddMvc();
         }

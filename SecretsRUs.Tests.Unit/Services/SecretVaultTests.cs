@@ -2,6 +2,7 @@
 using SecretsRUs.Models;
 using SecretsRUs.Repositories;
 using SecretsRUs.Services;
+using SecretsRUs.Services.Secrets;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -68,12 +69,30 @@ namespace SecretsRUs.Tests.Unit.Services
         {
             var userId = Guid.NewGuid().ToString();
             var repository = new Mock<ISecretsRepository>();
-            repository.Setup(x => x.Save(It.IsAny<string>(), It.IsAny<Secret>()));
+            repository.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Secret>()));
             var sut = new SecretVault(userId, repository.Object);
 
             sut.Save(new Secret());
 
-            repository.Verify(x => x.Save(It.IsAny<string>(), It.IsAny<Secret>()), Times.Once());
+            repository.Verify(x => x.Add(It.IsAny<string>(), It.IsAny<Secret>()), Times.Once());
+        }
+
+        [Fact]
+        public void SavesAnUpdatedSecretForAUserReturnsNotImplemented()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var repository = new Mock<ISecretsRepository>();
+
+            var sut = new SecretVault(userId, repository.Object);
+            var secret = new Secret
+            {
+                Id = 1234
+            };
+            var ex = Assert.Throws<NotImplementedException>(() => 
+                sut.Save(secret)
+            );
+
+            Assert.Contains("Update has not been implemented yet", ex.Message);
         }
     }
 }

@@ -1,16 +1,17 @@
-﻿using SecretsRUs.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using SecretsRUs.Models;
 using SecretsRUs.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SecretsRUs.Services
+namespace SecretsRUs.Services.Secrets
 {
-    public class SecretVault
+    public class SecretVault : ISecretVault
     {
-        private string _userId;
-        private ISecretsRepository _repository;
+        private readonly string _userId;
+        private readonly ISecretsRepository _repository;
 
         public SecretVault(string userId, ISecretsRepository repository)
         {
@@ -30,7 +31,14 @@ namespace SecretsRUs.Services
         {
             if (secret == null) throw new ArgumentNullException("secret");
 
-            _repository.Save(_userId, secret);
+            if (secret.Id <= 0)
+            {
+                _repository.Add(_userId, secret);
+            }
+            else
+            {
+                throw new NotImplementedException("Update has not been implemented yet");
+            }
         }
     }
 }
