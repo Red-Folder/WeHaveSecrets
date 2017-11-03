@@ -58,7 +58,7 @@ namespace SecretsRUs.Repositories
                 try
                 {
                     connection.Open();
-                    if (command.ExecuteNonQuery() == 1)
+                    if (command.ExecuteNonQuery() != 1)
                     {
                         throw new ApplicationException("Unable to save");
                     }
@@ -84,7 +84,7 @@ namespace SecretsRUs.Repositories
             if (reader.HasRows)
             {
                 reader.Read();
-                id = (int)reader[0];
+                id = Convert.ToInt32((Decimal)reader[0]);
             }
 
             return id;

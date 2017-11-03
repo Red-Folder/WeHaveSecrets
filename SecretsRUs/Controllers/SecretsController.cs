@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SecretsRUs.Services;
-using SecretsRUs.Models.Converters;
 using SecretsRUs.Models;
-using Microsoft.AspNetCore.Identity;
 using SecretsRUs.Services.Secrets;
 
 namespace SecretsRUs.Controllers
@@ -17,28 +13,53 @@ namespace SecretsRUs.Controllers
         {
             if (vault == null) throw new ArgumentNullException("vault");
 
-            var secrets = vault
-                            .GetAll()
-                            .Select(x => new SecretViewModelFromDomain(x))
-                            .ToList();
+            var vm = new SecretListAndNewViewModel
+            {
+                Secrets = GetList(vault),
+                NewSecret = new NewSecretViewModel()
+            };
 
-            return View(secrets);
+            return View(vm);
         }
 
         [HttpPost]
-        public IActionResult Index([FromServices]ISecretVault vault, SecretViewModel secret)
+        public IActionResult Index([FromServices]ISecretVault vault, NewSecretViewModel vm)
         {
             if (vault == null) throw new ArgumentNullException("vault");
 
             if (ModelState.IsValid)
             {
-                vault.Save(new SecretDomainFromViewModel(secret));
+                var domain = new Secret
+                {
+                    Key = vm.Key,
+                    Value = vm.Value
+                };
+                vault.Save(domain);
+
                 return RedirectToAction(actionName: nameof(Index));
             }
             else
             {
-                return BadRequest(ModelState);
+                var vm2 = new SecretListAndNewViewModel
+                {
+                    Secrets = GetList(vault),
+                    NewSecret = vm 
+                };
+                return View(vm2);
             }
+        }
+
+        private List<SecretViewModel> GetList(ISecretVault vault)
+        {
+            return vault
+                    .GetAll()
+                    .Select(x => new SecretViewModel
+                    {
+                        Id = x.Id,
+                        Key = x.Key,
+                        Value = x.Value
+                    })
+                    .ToList();
         }
     }
 }

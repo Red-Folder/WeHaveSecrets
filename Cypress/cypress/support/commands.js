@@ -54,3 +54,15 @@ Cypress.Commands.add("logout", () => {
     cy.get('.logout-button')
         .click()
 })
+
+Cypress.Commands.add("addSecret", (secretKey, secretValue) => {
+    cy.get('.secrets-link')
+        .click()
+    cy.get('#Key')
+        .type(secretKey)
+    cy.get('#Value')
+        .type(secretValue)
+    cy.get('#SaveButton')
+        .click()
+})
+

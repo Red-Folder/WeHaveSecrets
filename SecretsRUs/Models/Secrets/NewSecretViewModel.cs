@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace SecretsRUs.Models
 {
-    public class SecretViewModel
+    public class NewSecretViewModel
     {
-        public int Id;
+        [Required]
+        [DataType(DataType.Text)]
+        public string Key { get; set; }
 
         [Required]
-        public string Key;
+        [DataType(DataType.Text)]
+        public string Value { get; set; }
 
-        [Required]
-        public string Value;
     }
 }
