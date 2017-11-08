@@ -64,5 +64,29 @@ namespace WeHaveSecrets.Controllers
                     })
                     .ToList();
         }
+
+        public IActionResult PublicShare(ISecretVault vault, int id)
+        {
+            if (vault == null) throw new ArgumentNullException("vault");
+
+            var secret = vault.Get(id);
+
+            if (secret == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var vm = new SecretViewModel
+                {
+                    Id = secret.Id,
+                    Key = secret.Key,
+                    Value = secret.Value
+                };
+
+                return View(vm);
+            }
+            throw new NotImplementedException();
+        }
     }
 }

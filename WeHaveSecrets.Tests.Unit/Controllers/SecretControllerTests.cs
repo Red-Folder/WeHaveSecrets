@@ -135,5 +135,52 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
             Assert.Equal(2, secrets.Count());
             Assert.Single(viewResult.ViewData.ModelState);
         }
+
+        [Fact]
+        public async void PublicShareWithoutVaultThrowsArguementExcaption()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
+                new SecretsController().PublicShare(null, 1)
+            ));
+
+            Assert.Contains("vault", ex.Message);
+        }
+
+        [Fact]
+        public void PublicShareWithoutValidIdReturnsNotFound()
+        {
+            var vault = new Mock<ISecretVault>();
+            vault.Setup(x => x.Get(It.IsAny<int>())).Returns<Secret>(null);
+
+            var sut = new SecretsController();
+
+            var result = sut.PublicShare(vault.Object, 999);
+
+            var viewResult = Assert.IsType<NotFoundResult>(result);
+        }
+
+
+        [Fact]
+        public void PublicShareWithValidIdReturnsShaePage()
+        {
+            var vault = new Mock<ISecretVault>();
+            vault.Setup(x => x.Get(It.IsAny<int>())).Returns(new Secret
+            {
+                Id = 1,
+                Key = "MySecret",
+                Value = "SecretValue"
+            });
+
+            var sut = new SecretsController();
+
+            var result = sut.PublicShare(vault.Object, 1);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<SecretViewModel>(
+                viewResult.ViewData.Model);
+            Assert.Equal(1, model.Id);
+            Assert.Equal("MySecret", model.Key);
+            Assert.Equal("SecretValue", model.Value);
+        }
     }
 }

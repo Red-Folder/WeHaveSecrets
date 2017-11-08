@@ -22,6 +22,11 @@ namespace WeHaveSecrets.Services.Secrets
             _repository = repository;
         }
 
+        public Secret Get(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Secret> GetAll()
         {
             return _repository.GetAll(_userId);

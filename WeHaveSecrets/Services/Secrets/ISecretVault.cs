@@ -10,5 +10,6 @@ namespace WeHaveSecrets.Services.Secrets
     {
         List<Secret> GetAll();
         void Save(Secret secret);
+        Secret Get(int id);
     }
 }
