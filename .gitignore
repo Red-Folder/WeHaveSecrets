@@ -287,4 +287,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-/SecretsRUs/appsettings.Development.json
+/WeHaveSecrets/appsettings.Development.json
+/Cypress/cypress/videos
+/Cypress/cypress/screenshots

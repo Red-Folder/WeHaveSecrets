@@ -1,5 +1,5 @@
 {
-  "name": "secretsrus-cypress-tests",
+  "name": "WeHaveSecrets-cypress-tests",
   "version": "1.0.0",
   "description": "Dependencies for running Cypress.io",
   "scripts": {
