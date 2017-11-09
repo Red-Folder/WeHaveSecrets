@@ -65,7 +65,7 @@ namespace WeHaveSecrets.Controllers
                     .ToList();
         }
 
-        public IActionResult PublicShare(ISecretVault vault, int id)
+        public IActionResult PublicShare([FromServices]ISecretVault vault, int id)
         {
             if (vault == null) throw new ArgumentNullException("vault");
 

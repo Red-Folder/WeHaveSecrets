@@ -26,7 +26,14 @@ namespace WeHaveSecrets.Services.Secrets
         {
             var user = _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User).Result;
 
-            return new SecretVault(user.Id, _repository);
+            if (user == null)
+            {
+                return new AnonymousVault(_repository);
+            }
+            else
+            {
+                return new UserVault(user.Id, _repository);
+            }
         }
     }
 }

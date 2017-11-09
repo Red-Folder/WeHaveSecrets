@@ -8,17 +8,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using System.Security.Authentication;
 
 namespace WeHaveSecrets.Tests.Unit.Services
 {
-    public class SecretVaultTests
+    public class UserVaultTests
     {
         [Fact]
         public async void CreatingWithoutAUserIdWillThrowNullArgumentException()
         {
             var repository = new Mock<ISecretsRepository>();
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new SecretVault(null, repository.Object)
+                new UserVault(null, repository.Object)
             ));
 
             Assert.Contains("userId", ex.Message);
@@ -29,7 +30,7 @@ namespace WeHaveSecrets.Tests.Unit.Services
         {
             var userId = Guid.NewGuid().ToString();
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new SecretVault(userId, null)
+                new UserVault(userId, null)
             ));
 
             Assert.Contains("repository", ex.Message);
@@ -45,7 +46,7 @@ namespace WeHaveSecrets.Tests.Unit.Services
                 new Secret(),
                 new Secret()
             });
-            var sut = new SecretVault(userId, repository.Object);
+            var sut = new UserVault(userId, repository.Object);
 
             Assert.Equal(2, sut.GetAll().Count);
         }
@@ -55,7 +56,7 @@ namespace WeHaveSecrets.Tests.Unit.Services
         {
             var userId = Guid.NewGuid().ToString();
             var repository = new Mock<ISecretsRepository>();
-            var sut = new SecretVault(userId, repository.Object);
+            var sut = new UserVault(userId, repository.Object);
 
             var ex = Assert.Throws<ArgumentNullException>(() => 
                 sut.Save(null)
@@ -70,7 +71,7 @@ namespace WeHaveSecrets.Tests.Unit.Services
             var userId = Guid.NewGuid().ToString();
             var repository = new Mock<ISecretsRepository>();
             repository.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Secret>()));
-            var sut = new SecretVault(userId, repository.Object);
+            var sut = new UserVault(userId, repository.Object);
 
             sut.Save(new Secret());
 
@@ -83,7 +84,7 @@ namespace WeHaveSecrets.Tests.Unit.Services
             var userId = Guid.NewGuid().ToString();
             var repository = new Mock<ISecretsRepository>();
 
-            var sut = new SecretVault(userId, repository.Object);
+            var sut = new UserVault(userId, repository.Object);
             var secret = new Secret
             {
                 Id = 1234
@@ -93,6 +94,26 @@ namespace WeHaveSecrets.Tests.Unit.Services
             );
 
             Assert.Contains("Update has not been implemented yet", ex.Message);
+        }
+
+        [Fact]
+        public void ReturnsSecretForGet()
+        {
+            var userId = Guid.NewGuid().ToString();
+            var repository = new Mock<ISecretsRepository>();
+            repository.Setup(x => x.Get(It.IsAny<int>())).Returns(new Secret
+            {
+                Id = 1,
+                Key = "SecretKey",
+                Value = "SecretValue"
+            });
+            var sut = new UserVault(userId, repository.Object);
+
+            var result = sut.Get(1);
+
+            Assert.Equal(1, result.Id);
+            Assert.Equal("SecretKey", result.Key);
+            Assert.Equal("SecretValue", result.Value);
         }
     }
 }

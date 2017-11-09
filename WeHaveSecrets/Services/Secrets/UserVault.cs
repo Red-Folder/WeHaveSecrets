@@ -5,34 +5,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 
 namespace WeHaveSecrets.Services.Secrets
 {
-    public class SecretVault : ISecretVault
+    public class UserVault : AbstractVault
     {
         private readonly string _userId;
-        private readonly ISecretsRepository _repository;
 
-        public SecretVault(string userId, ISecretsRepository repository)
+        public UserVault(string userId, ISecretsRepository repository): base(repository)
         {
             if (userId == null) throw new ArgumentNullException("userId");
-            if (repository == null) throw new ArgumentNullException("repository");
 
             _userId = userId;
-            _repository = repository;
         }
 
-        public Secret Get(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Secret> GetAll()
+        public override List<Secret> GetAll()
         {
             return _repository.GetAll(_userId);
         }
 
-        public void Save(Secret secret)
+        public override void Save(Secret secret)
         {
             if (secret == null) throw new ArgumentNullException("secret");
 
@@ -45,5 +38,6 @@ namespace WeHaveSecrets.Services.Secrets
                 throw new NotImplementedException("Update has not been implemented yet");
             }
         }
+
     }
 }

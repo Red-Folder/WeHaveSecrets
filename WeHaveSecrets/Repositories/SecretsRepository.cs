@@ -89,5 +89,34 @@ namespace WeHaveSecrets.Repositories
 
             return id;
         }
+
+        public Secret Get(int id)
+        {
+            Secret secret = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"select Id, [Key], [Value] from Secrets where Secrets.Id = '{id}'";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        secret = new Secret();
+                        secret.Id = (int)reader[0];
+                        secret.Key = reader[1].ToString();
+                        secret.Value = reader[2].ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return secret;
+        }
     }
 }

@@ -10,5 +10,7 @@ namespace WeHaveSecrets.Repositories
     {
         List<Secret> GetAll(string userId);
         Secret Add(string userId, Secret secret);
+
+        Secret Get(int id);
     }
 }
