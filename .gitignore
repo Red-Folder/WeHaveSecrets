@@ -290,3 +290,4 @@ __pycache__/
 /WeHaveSecrets/appsettings.Development.json
 /Cypress/cypress/videos
 /Cypress/cypress/screenshots
+/.sonarqube
