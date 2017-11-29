@@ -11,7 +11,7 @@ namespace WeHaveSecrets.Services.Secrets
 {
     public class UserVault : AbstractVault
     {
-        private readonly string _userId;
+        protected string _userId;
 
         public UserVault(string userId, ISecretsRepository repository): base(repository)
         {

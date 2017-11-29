@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  wehavesecrets:
+    image: wehavesecrets
+    build:
+      context: ./WeHaveSecrets
+      dockerfile: Dockerfile
