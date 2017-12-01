@@ -6,3 +6,9 @@ services:
     build:
       context: ./WeHaveSecrets
       dockerfile: Dockerfile
+
+  db.wehavesecrets.setup:
+    image: db.wehavesecrets.setup
+    build:
+      context: ./Db.WeHaveSecrets.Setup
+      dockerfile: Dockerfile
