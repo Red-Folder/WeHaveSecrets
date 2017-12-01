@@ -23,7 +23,7 @@ namespace Db.WeHaveSecrets.Setup
             {
                 try
                 {
-                    MigrateDatabase(args[0]);
+                    MigrateDatabase(connectionString);
                 }
                 catch (Exception ex)
                 {
