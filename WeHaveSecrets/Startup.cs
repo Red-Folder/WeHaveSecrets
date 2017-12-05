@@ -9,14 +9,22 @@ using WeHaveSecrets.Services.Identity;
 using WeHaveSecrets.Repositories;
 using Microsoft.AspNetCore.Http;
 using WeHaveSecrets.Services.Secrets;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace WeHaveSecrets
 {
     public class Startup
     {
+        private readonly string _backupPath;
+        private readonly string _backupFolder;
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _backupFolder = "/backups";
+            _backupPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "backups");
         }
 
         public IConfiguration Configuration { get; }
@@ -49,7 +57,9 @@ namespace WeHaveSecrets
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddTransient<IIdentityRepository>(e => new IdentityRepository(connectionString));
             services.AddTransient<ISecretsRepository>(e => new SecretsRepository(connectionString));
+            services.AddTransient<IMaintenanceRepository>(e => new MaintenanceRepository(connectionString));
 
+            services.AddTransient<IDatabaseMaintenance>(e => new DatabaseMaintenance(_backupFolder, _backupPath, e.GetRequiredService<IMaintenanceRepository>()));
             services.AddTransient<IAdminVault, AdminVault>();
 
             // TODO
@@ -65,6 +75,8 @@ namespace WeHaveSecrets
                                         x.GetRequiredService<IHttpContextAccessor>(),
                                         x.GetRequiredService<ISecretsRepository>()).CreateVault()
             );
+
+            services.AddDirectoryBrowser();
 
             services.AddMvc();
         }
@@ -84,6 +96,19 @@ namespace WeHaveSecrets
             }
 
             app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(_backupPath),
+                ServeUnknownFileTypes = true,
+                RequestPath = new PathString(_backupFolder)
+            });
+
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                FileProvider = new PhysicalFileProvider(_backupPath),
+                RequestPath = new PathString(_backupFolder)
+            });
 
             app.UseAuthentication();
 

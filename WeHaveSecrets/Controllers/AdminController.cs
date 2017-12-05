@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WeHaveSecrets.Models.AccountViewModels;
 using WeHaveSecrets.Services.Identity;
 using System.Threading;
+using WeHaveSecrets.Services;
 
 namespace WeHaveSecrets.Controllers
 {
@@ -90,6 +91,32 @@ namespace WeHaveSecrets.Controllers
                 await passwordStore.UpdateAsync(user, cancellationToken);
 
                 model.Updated = true;
+            }
+
+            return View(model);
+        }
+
+        public IActionResult BackupDatabase([FromServices]IDatabaseMaintenance databaseMaintenance)
+        {
+            var model = new BackupsViewModel();
+            if (databaseMaintenance.Backup())
+            {
+                model.Successful = true;
+
+                model.AvailableBackups = databaseMaintenance
+                                            .Backups()
+                                            .Select(x => new BackupViewModel
+                                            {
+                                                Url = x.Url,
+                                                Created = x.Created
+                                            })
+                                            .OrderByDescending(x => x.Created)
+                                            .ToList();
+            }
+            else
+            {
+                model.Successful = false;
+                model.ErrorMessage = "Backup failed.  Please check logs.";
             }
 
             return View(model);

@@ -10,5 +10,10 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <li><a asp-area="" asp-controller="Secrets" asp-action="Index" class="secrets-link">Secrets</a></li>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <li><a asp-area="" asp-controller="Admin" asp-action="Index" class="secrets-link">Admin</a></li>
+        }
     }
 </ul>
