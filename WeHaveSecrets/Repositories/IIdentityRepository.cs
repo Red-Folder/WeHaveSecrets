@@ -11,6 +11,7 @@ namespace WeHaveSecrets.Repositories
         ApplicationUser FindByName(string name);
         ApplicationUser FindById(string userId);
         bool Create(ApplicationUser user);
+        bool Update(ApplicationUser user);
 
         ApplicationRole FindRoleById(string roleId);
         bool IsInRole(string userId, string roleId);

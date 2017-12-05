@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using WeHaveSecrets.Models;
 using WeHaveSecrets.Models.Secrets;
 using WeHaveSecrets.Services.Secrets;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using WeHaveSecrets.Models.AccountViewModels;
+using WeHaveSecrets.Services.Identity;
+using System.Threading;
 
 namespace WeHaveSecrets.Controllers
 {
@@ -36,14 +40,14 @@ namespace WeHaveSecrets.Controllers
         }
 
         [HttpPost]
-        public IActionResult SecretsFor(string userName)
+        public async Task<IActionResult> SecretsFor(string userName)
         {
             var model = new SecretsForViewModel();
             if (ModelState.IsValid)
             {
                 model.UserName = userName;
 
-                var user = _userManager.FindByNameAsync(userName).Result;
+                var user = await _userManager.FindByNameAsync(userName);
 
                 if (user != null)
                 {
@@ -64,5 +68,31 @@ namespace WeHaveSecrets.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            var model = new ChangePasswordViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromServices]IUserPasswordStore<ApplicationUser> passwordStore, string userName, string newPassword)
+        {
+            var model = new ChangePasswordViewModel();
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(userName);
+                var hashedPassword = _userManager.PasswordHasher.HashPassword(user, newPassword);
+
+                var cancellationToken = new CancellationToken();
+                await passwordStore.SetPasswordHashAsync(user, hashedPassword, cancellationToken);
+                await passwordStore.UpdateAsync(user, cancellationToken);
+
+                model.Updated = true;
+            }
+
+            return View(model);
+        }
     }
 }

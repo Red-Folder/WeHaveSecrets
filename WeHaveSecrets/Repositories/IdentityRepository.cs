@@ -201,5 +201,30 @@ namespace WeHaveSecrets.Repositories
             }
             return results;
         }
+
+        public bool Update(ApplicationUser user)
+        {
+            var result = false;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"update Users set Username = '{user.UserName}', PasswordHash = '{user.PasswordHash}' where Id = '{user.Id}'";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    if (command.ExecuteNonQuery() == 1)
+                    {
+                        result = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return result;
+        }
     }
 }

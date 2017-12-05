@@ -42,6 +42,7 @@ namespace WeHaveSecrets
 
             // Identity Services
             services.AddTransient<IUserStore<ApplicationUser>, CustomUserStore>();
+            services.AddTransient<IUserPasswordStore<ApplicationUser>, CustomUserStore>();
             services.AddTransient<IRoleStore<ApplicationRole>, CustomRoleStore>();
 
             // Repositories

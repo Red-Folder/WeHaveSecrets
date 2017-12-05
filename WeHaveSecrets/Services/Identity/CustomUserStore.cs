@@ -174,8 +174,29 @@ namespace WeHaveSecrets.Services.Identity
 
         public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            //throw new NotImplementedException();
-            return Task.FromResult(IdentityResult.Success);
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IdentityResult result = null;
+            var worked = _repository.Update(user);
+            if (worked)
+            {
+                result = IdentityResult.Success;
+            }
+            else
+            {
+                var errors = new IdentityError[]
+                {
+                        new IdentityError()
+                };
+                result = IdentityResult.Failed(errors);
+            }
+
+            return Task.FromResult(result);
         }
 
         private void ThrowIfDisposed()
