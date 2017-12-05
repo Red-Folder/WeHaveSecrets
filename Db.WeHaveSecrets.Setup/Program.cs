@@ -49,6 +49,8 @@ namespace Db.WeHaveSecrets.Setup
             {
                 Console.WriteLine("Running migration");
                 context.Database.Migrate();
+                Console.WriteLine("Seeding database");
+                context.EnsureSeedData();
             }
 
             Console.WriteLine("Completed");

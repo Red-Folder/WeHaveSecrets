@@ -11,6 +11,7 @@ namespace Db.WeHaveSecrets
         public WeHaveSecretsContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<WeHaveSecretsContext>();
+            optionsBuilder.UseSqlServer("Server=LT004447\\SQLEXPRESS;Database=WeHaveSecrets;Trusted_Connection=True;");
             return new WeHaveSecretsContext(optionsBuilder.Options);
         }
     }
