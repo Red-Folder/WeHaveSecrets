@@ -94,16 +94,14 @@ namespace WeHaveSecrets.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    ApplicationRole applicationRole = await _roleManager.FindByIdAsync("User");
-                    if (applicationRole != null)
+                    await AddUserToRoleAsync("User", user);
+                    if (user.UserName.EndsWith(".Admin"))
                     {
-                        IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
-                        if (roleResult.Succeeded)
-                        {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
-                            return RedirectToLocal(returnUrl);
-                        }
+                        await AddUserToRoleAsync("Admin", user);
                     }
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
             }
@@ -146,6 +144,20 @@ namespace WeHaveSecrets.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+        private async Task<bool> AddUserToRoleAsync(string role, ApplicationUser user)
+        {
+            ApplicationRole applicationRole = await _roleManager.FindByIdAsync(role);
+            if (applicationRole != null)
+            {
+                IdentityResult roleResult = await _userManager.AddToRoleAsync(user, applicationRole.Name);
+                if (roleResult.Succeeded)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion
