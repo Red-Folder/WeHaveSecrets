@@ -7,7 +7,7 @@ namespace WeHaveSecrets.Models.Secrets
 {
     public class SecretsForViewModel
     {
-        public string UserId;
+        public string UserName;
         public List<SecretViewModel> Secrets;
     }
 }

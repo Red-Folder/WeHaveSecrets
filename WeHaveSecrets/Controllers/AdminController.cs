@@ -26,8 +26,7 @@ namespace WeHaveSecrets.Controllers
 
         public IActionResult Index()
         {
-            var users = _userManager.Users.ToArray();
-            return View(users);
+            return View();
         }
 
         [HttpGet]
@@ -37,22 +36,27 @@ namespace WeHaveSecrets.Controllers
         }
 
         [HttpPost]
-        public IActionResult SecretsFor(string userId)
+        public IActionResult SecretsFor(string userName)
         {
             var model = new SecretsForViewModel();
             if (ModelState.IsValid)
             {
-                model.UserId = userId;
+                model.UserName = userName;
 
-                _vault.UserId = userId;
-                model.Secrets = _vault.GetAll()
-                                    .Select(x => new SecretViewModel
-                                    {
-                                        Id = x.Id,
-                                        Key = x.Key,
-                                        Value = x.Value
-                                    })
-                                    .ToList(); ;
+                var user = _userManager.FindByNameAsync(userName).Result;
+
+                if (user != null)
+                {
+                    _vault.UserId = user.Id;
+                    model.Secrets = _vault.GetAll()
+                                        .Select(x => new SecretViewModel
+                                        {
+                                            Id = x.Id,
+                                            Key = x.Key,
+                                            Value = x.Value
+                                        })
+                                        .ToList();
+                }
             }
 
 

@@ -49,6 +49,7 @@ namespace WeHaveSecrets
             services.AddTransient<IIdentityRepository>(e => new IdentityRepository(connectionString));
             services.AddTransient<ISecretsRepository>(e => new SecretsRepository(connectionString));
 
+            services.AddTransient<IAdminVault, AdminVault>();
 
             // TODO
             //services.AddTransient<DapperUsersTable>();
