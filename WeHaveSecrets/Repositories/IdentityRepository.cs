@@ -140,7 +140,7 @@ namespace WeHaveSecrets.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = $"select Id, UserId, RoleId from UserRoles where UserRoles.UserId = '{userId}' and UserRoles.RoleId = '{roleId}'";
+                var query = $"select UserId, RoleId from UserRole where UserRole.UserId = '{userId}' and UserRole.RoleId = '{roleId}'";
                 var command = new SqlCommand(query, connection);
                 try
                 {
@@ -163,7 +163,7 @@ namespace WeHaveSecrets.Repositories
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = $"insert into UserRoles (Id, UserId, RoleId) Values ('{Guid.NewGuid().ToString()}', '{userId}', '{roleId}')";
+                var query = $"insert into UserRole (UserId, RoleId) Values ('{userId}', '{roleId}')";
                 var command = new SqlCommand(query, connection);
                 try
                 {
@@ -183,7 +183,7 @@ namespace WeHaveSecrets.Repositories
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var query = $"select Id, UserId, RoleId from UserRoles where UserRoles.UserId = '{userId}'";
+                var query = $"select UserId, RoleId from UserRole where UserRole.UserId = '{userId}'";
                 var command = new SqlCommand(query, connection);
                 try
                 {
@@ -191,7 +191,7 @@ namespace WeHaveSecrets.Repositories
                     var reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        results.Add(reader[2].ToString());
+                        results.Add(reader[reader.GetOrdinal("RoleId")].ToString());
                     }
                 }
                 catch (Exception ex)
