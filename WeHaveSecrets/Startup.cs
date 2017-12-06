@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using WeHaveSecrets.Services.Secrets;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
+using WeHaveSecrets.Services.Social;
 
 namespace WeHaveSecrets
 {
@@ -58,7 +59,9 @@ namespace WeHaveSecrets
             services.AddTransient<IIdentityRepository>(e => new IdentityRepository(connectionString));
             services.AddTransient<ISecretsRepository>(e => new SecretsRepository(connectionString));
             services.AddTransient<IMaintenanceRepository>(e => new MaintenanceRepository(connectionString));
+            services.AddTransient<ITestimonialRepository>(e => new TestimonialRepository(connectionString));
 
+            services.AddTransient<ISocialProof, SocialProof>();
             services.AddTransient<IDatabaseMaintenance>(e => new DatabaseMaintenance(_backupFolder, _backupPath, e.GetRequiredService<IMaintenanceRepository>()));
             services.AddTransient<IAdminVault, AdminVault>();
 

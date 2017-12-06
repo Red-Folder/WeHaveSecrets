@@ -1,0 +1,19 @@
+﻿@model NewTestimonialViewModel
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Add Testimonial
+    </div>
+    <div class="panel-body">
+        <form method="post" asp-controller="Home" asp-action="AddTestimonial">
+            <div class="form-group">
+                <label asp-for="Comment"></label>
+                <input asp-for="Comment" class="form-control" />
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+
+            <input type="submit" value="Save" id="SaveButton" name="SaveButton" class="btn btn-primary" />
+        </form>
+    </div>
+</div>
+

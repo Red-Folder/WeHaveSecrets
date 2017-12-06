@@ -16,6 +16,7 @@ namespace Db.WeHaveSecrets
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Secret> Secrets { get; set; }
+        public DbSet<Testimonial> Testimonials { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

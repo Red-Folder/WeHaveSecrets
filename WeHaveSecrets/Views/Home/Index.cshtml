@@ -2,9 +2,19 @@
     ViewData["Title"] = "Home Page";
 }
 
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
 <h2>WeHaveSecrets</h2>
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-9">
         TODO.  Make a lovely landing page extolling the virtues of WeHaveSecrets
+    </div>
+    <div class="col-md-3">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @await Html.PartialAsync("_AddTestimonial", new NewTestimonialViewModel())
+        }
     </div>
 </div>

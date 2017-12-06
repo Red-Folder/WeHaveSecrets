@@ -11,5 +11,6 @@ namespace Db.WeHaveSecrets.Models
         public string PasswordHash { get; set; }
 
         public List<UserRole> UserRoles { get; set; }
+        public List<Testimonial> Testimonials { get; set; }
     }
 }
