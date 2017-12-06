@@ -11,9 +11,10 @@ using System;
 namespace Db.WeHaveSecrets.Migrations
 {
     [DbContext(typeof(WeHaveSecretsContext))]
-    partial class WeHaveSecretsContextModelSnapshot : ModelSnapshot
+    [Migration("20171206155042_ChangeToUserRoles")]
+    partial class ChangeToUserRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
