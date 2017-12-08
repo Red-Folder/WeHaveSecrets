@@ -1,0 +1,13 @@
+﻿@inject ISocialProof socialProof
+
+<h2>How much our customers love us ...</h2>
+
+<div class="row">
+    @foreach (var testimonial in socialProof.AllTestimonials().Select(x => new TestimonialViewModel { Comment = x.Comment }))
+    {
+        <div class="col-md-4">
+            @testimonial.Comment
+        </div>
+    }
+</div>
+

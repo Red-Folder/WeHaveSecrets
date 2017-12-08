@@ -9,5 +9,6 @@ namespace WeHaveSecrets.Services.Social
     public interface ISocialProof
     {
         void Save(Testimonial testimonial);
+        List<Testimonial> AllTestimonials();
     }
 }

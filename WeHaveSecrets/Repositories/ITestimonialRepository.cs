@@ -9,5 +9,6 @@ namespace WeHaveSecrets.Repositories
     public interface ITestimonialRepository
     {
         void Save(Testimonial testimonial);
+        List<Testimonial> GetAll();
     }
 }

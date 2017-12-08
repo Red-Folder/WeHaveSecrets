@@ -18,6 +18,11 @@ namespace WeHaveSecrets.Services.Social
             _testimonialRepository = testimonialRepository;
         }
 
+        public List<Testimonial> AllTestimonials()
+        {
+            return _testimonialRepository.GetAll();
+        }
+
         public void Save(Testimonial testimonial)
         {
             _testimonialRepository.Save(testimonial);

@@ -20,6 +20,33 @@ namespace WeHaveSecrets.Repositories
             _connectionString = connectionString;
         }
 
+        public List<Testimonial> GetAll()
+        {
+            var results = new List<Testimonial>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var query = $"select Comment from Testimonials";
+                var command = new SqlCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var testimonial = new Testimonial();
+                        testimonial.Comment = reader[reader.GetOrdinal("Comment")].ToString();
+                        results.Add(testimonial);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return results;
+        }
+
         public void Save(Testimonial testimonial)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -40,5 +67,7 @@ namespace WeHaveSecrets.Repositories
                 }
             }
         }
+
+
     }
 }
