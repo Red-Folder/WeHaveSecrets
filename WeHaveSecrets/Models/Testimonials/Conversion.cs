@@ -5,21 +5,14 @@ using System.Threading.Tasks;
 
 namespace WeHaveSecrets.Models.Testimonials
 {
-    public class Testimonial
+    public static class Conversion
     {
-        public string Id { get; set; }
-        public string UserId { get; set; }
-        public string Comment { get; set; }
-        public DateTime Created { get; set; }
-
-
-        public static explicit operator TestimonialViewModel(Testimonial domain)
+        public static TestimonialViewModel AsViewModel(Testimonial domain)
         {
             return new TestimonialViewModel
             {
                 Comment = domain.Comment
             };
         }
-
     }
 }

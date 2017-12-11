@@ -37,9 +37,8 @@
     <div class="container body-content">
         @RenderBody()
         <hr />
-        @await Html.PartialAsync("_Testimonials")
-        <hr />
         <footer>
+            @await Component.InvokeAsync("Testimonials")
             <p>&copy; 2017 - WeHaveSecrets</p>
         </footer>
     </div>
