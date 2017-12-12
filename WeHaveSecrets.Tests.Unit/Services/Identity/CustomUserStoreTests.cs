@@ -24,6 +24,7 @@ namespace WeHaveSecrets.Tests.Unit.Services.Identity
             Assert.Contains("repository", ex.Message);
         }
 
+        #region CreateAsync
         [Fact]
         public async void CreateAsyncWithoutUserThrowsArgumentNullException()
         {
@@ -90,6 +91,7 @@ namespace WeHaveSecrets.Tests.Unit.Services.Identity
 
             Assert.NotEqual(IdentityResult.Success, await sut.CreateAsync(user, cancellationToken));
         }
+        #endregion
 
         [Fact]
         public async void DeleteAsyncThrowsNotImplementedException()
@@ -642,19 +644,74 @@ namespace WeHaveSecrets.Tests.Unit.Services.Identity
             );
         }
 
-        /*
-        [Fact(Skip = "TODO")]
-        public async void UpdateAsyncReturnsSuccess()
+        #region UpdateAsync
+        [Fact]
+        public async void UpdateAsyncWithoutUserThrowsArgumentNullException()
+        {
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                sut.UpdateAsync(null, cancellationToken)
+            );
+
+            Assert.Contains("user", ex.Message);
+        }
+
+        [Fact]
+        public async void UpdateAsyncCancelledTokenThrowsException()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken(true);
+            var mockRepository = new Mock<IIdentityRepository>();
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            await Assert.ThrowsAsync<OperationCanceledException>(() =>
+                sut.UpdateAsync(user, cancellationToken)
+            );
+        }
+
+        [Fact]
+        public async void UpdateAsyncIfDisposedThrowsObjectDisposedException()
         {
             var user = new ApplicationUser();
             var cancellationToken = new CancellationToken();
             var mockRepository = new Mock<IIdentityRepository>();
-            mockRepository.Setup(x => x.Create(It.IsAny<ApplicationUser>())).Returns(true);
+            var sut = new CustomUserStore(mockRepository.Object);
+            sut.Dispose();
+
+            var ex = await Assert.ThrowsAsync<ObjectDisposedException>(() =>
+                sut.UpdateAsync(user, cancellationToken)
+            );
+
+            Assert.Contains("CustomUserStore", ex.Message);
+        }
+
+        [Fact]
+        public async void UpdateAsyncReturnsSuccessIfSaved()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.Update(It.IsAny<ApplicationUser>())).Returns(true);
             var sut = new CustomUserStore(mockRepository.Object);
 
             Assert.Equal(IdentityResult.Success, await sut.UpdateAsync(user, cancellationToken));
         }
-        */
+
+        [Fact]
+        public async void UpdateAsyncReturnsFailureIfNotSaved()
+        {
+            var user = new ApplicationUser();
+            var cancellationToken = new CancellationToken();
+            var mockRepository = new Mock<IIdentityRepository>();
+            mockRepository.Setup(x => x.Update(It.IsAny<ApplicationUser>())).Returns(false);
+            var sut = new CustomUserStore(mockRepository.Object);
+
+            Assert.NotEqual(IdentityResult.Success, await sut.UpdateAsync(user, cancellationToken));
+        }
+        #endregion
 
         #region AddToRoleAsync
         [Fact]

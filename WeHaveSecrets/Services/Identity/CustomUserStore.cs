@@ -113,10 +113,6 @@ namespace WeHaveSecrets.Services.Identity
 
             return Task.FromResult(user.Id);
         }
-        private string GetUserId(ApplicationUser user)
-        {
-            return user.Id;
-        }
 
         public Task<string> GetUserNameAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
