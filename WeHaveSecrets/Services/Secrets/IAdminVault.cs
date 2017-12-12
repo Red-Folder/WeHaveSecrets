@@ -7,6 +7,6 @@ namespace WeHaveSecrets.Services.Secrets
 {
     public interface IAdminVault: ISecretVault
     {
-        string UserId { set; get; }
+        string UserId { set;}
     }
 }

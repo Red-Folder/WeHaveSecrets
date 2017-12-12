@@ -14,11 +14,6 @@ namespace WeHaveSecrets.Services.Secrets
 
         public string UserId
         {
-            get
-            {
-                return _userId;
-            }
-
             set
             {
                 if (value == null) throw new ArgumentNullException("userId");
