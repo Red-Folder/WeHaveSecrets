@@ -21,6 +21,7 @@ namespace WeHaveSecrets.Services.Secrets
 
             set
             {
+                if (value == null) throw new ArgumentNullException("userId");
                 _userId = value;
             }
         }
