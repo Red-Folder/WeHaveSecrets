@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Security.Authentication;
 
-namespace WeHaveSecrets.Tests.Unit.Services
+namespace WeHaveSecrets.Tests.Unit.Services.Secrets
 {
     public class AnonymousVaultTests
     {

@@ -17,6 +17,10 @@ namespace WeHaveSecrets.Services.Secrets
 
         public SecretVaultFactory(UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, ISecretsRepository repository)
         {
+            if (userManager == null) throw new ArgumentNullException("userManager");
+            if (httpContextAccessor == null) throw new ArgumentNullException("httpContextAccessor");
+            if (repository == null) throw new ArgumentNullException("repository");
+
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _repository = repository;
@@ -24,15 +28,30 @@ namespace WeHaveSecrets.Services.Secrets
 
         public ISecretVault CreateVault()
         {
-            var user = _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User).Result;
-
-            if (user == null)
+            if (CurrentUser == null)
             {
                 return new AnonymousVault(_repository);
             }
             else
             {
-                return new UserVault(user.Id, _repository);
+                return new UserVault(CurrentUser.Id, _repository);
+            }
+        }
+
+        private ApplicationUser CurrentUser
+        {
+            get
+            {
+                var userContext = _httpContextAccessor?.HttpContext?.User;
+
+                if (userContext == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return _userManager.GetUserAsync(userContext).Result;
+                }
             }
         }
     }
