@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Moq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WeHaveSecrets.Models.AccountViewModels;
 
 namespace WeHaveSecrets.Tests.Unit.Controllers
 {
@@ -18,7 +19,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         public async void ConstructorWithoutUserManagerThrowsArgumentExcaption()
         {
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new AccountController(null, FakeSignInManager().Object, MockRoleManager().Object)
+                new AccountController(null, MockSignInManager().Object, MockRoleManager().Object)
             ));
 
             Assert.Contains("userManager", ex.Message);
@@ -38,21 +39,89 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         public async void ConstructorWithoutRoleManagerThrowsArgumentExcaption()
         {
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new AccountController(MockUserManager().Object, FakeSignInManager().Object, null)
+                new AccountController(MockUserManager().Object, MockSignInManager().Object, null)
             ));
 
             Assert.Contains("roleManager", ex.Message);
         }
 
         [Fact]
-        public void LoginGetReturnsView()
+        public void LoginReturnsView()
         {
-            var signInManager = FakeSignInManager();
+            var signInManager = MockSignInManager();
             signInManager.Setup(x => x.SignOutAsync()).Returns(Task.CompletedTask);
 
             var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
             var result = sut.Login().Result;
             Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ValidLoginReturnsRedirect()
+        {
+            var signInManager = MockSignInManager();
+            signInManager.Setup(x => x.PasswordSignInAsync(It.IsAny<string>(),
+                                                            It.IsAny<string>(),
+                                                            It.IsAny<bool>(),
+                                                            It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Success));
+
+            var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
+
+            var viewModel = new LoginViewModel();
+            var returnTo = "Index";
+
+            var result = sut.Login(viewModel, returnTo).Result;
+
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectToActionResult.ActionName);
+        }
+
+        [Fact]
+        public void FailedLoginReturnsView()
+        {
+            var signInManager = MockSignInManager();
+            signInManager.Setup(x => x.PasswordSignInAsync(It.IsAny<string>(),
+                                                            It.IsAny<string>(),
+                                                            It.IsAny<bool>(),
+                                                            It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Failed));
+
+            var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
+
+            var viewModel = new LoginViewModel
+            {
+                Username = "User1",
+                Password = "12345"
+            };
+            var returnTo = "Index";
+
+            var result = sut.Login(viewModel, returnTo).Result;
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<LoginViewModel>(viewResult.ViewData.Model);
+            Assert.Equal("User1", model.Username);
+            Assert.Equal("12345", model.Password);
+        }
+
+        [Fact]
+        public void InvalidLoginReturnsView()
+        {
+            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            sut.ModelState.AddModelError("Username", "Required");
+
+            var viewModel = new LoginViewModel
+            {
+                Username = null,
+                Password = "12345"
+            };
+            var returnTo = "Index";
+
+            var result = sut.Login(viewModel, returnTo).Result;
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<LoginViewModel>(viewResult.ViewData.Model);
+            Assert.Null(model.Username);
+            Assert.Equal("12345", model.Password);
+            Assert.Single(viewResult.ViewData.ModelState);
         }
 
         private Mock<UserManager<ApplicationUser>> MockUserManager(IUserStore<ApplicationUser> userStore = null)
@@ -61,7 +130,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
             return new Mock<UserManager<ApplicationUser>>(userStore, null, null, null, null, null, null, null, null);
         }
 
-        private Mock<SignInManager<ApplicationUser>> FakeSignInManager(UserManager<ApplicationUser> userManager = null,
+        private Mock<SignInManager<ApplicationUser>> MockSignInManager(UserManager<ApplicationUser> userManager = null,
                                                                  IHttpContextAccessor httpContextAccessor = null,
                                                                  IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory = null)
         {
