@@ -29,6 +29,10 @@ namespace WeHaveSecrets.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager)
         {
+            if (userManager == null) throw new ArgumentNullException(nameof(userManager));
+            if (signInManager == null) throw new ArgumentNullException(nameof(signInManager));
+            if (roleManager == null) throw new ArgumentNullException(nameof(roleManager));
+
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
@@ -42,7 +46,7 @@ namespace WeHaveSecrets.Controllers
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            await _signInManager.SignOutAsync();
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();
