@@ -124,6 +124,163 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
             Assert.Single(viewResult.ViewData.ModelState);
         }
 
+        [Fact]
+        public void RegisterReturnsView()
+        {
+            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            var result = sut.Login().Result;
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void ValidRegistrtionReturnsRedirect()
+        {
+            var userManager = MockUserManager();
+            userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                       .Returns(Task.FromResult(IdentityResult.Success));
+
+            var sut = new AccountController(userManager.Object, MockSignInManager().Object, MockRoleManager().Object);
+
+            var viewModel = new RegisterViewModel
+            {
+                Username = "TestUser",
+                Password = "TestPassword",
+                ConfirmPassword = "TestPassword"
+            };
+            var returnTo = "Index";
+
+            var result = sut.Register(viewModel, returnTo).Result;
+
+            var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectToActionResult.ActionName);
+        }
+
+        [Fact]
+        public void FailedRegistrationReturnsView()
+        {
+            var userManager = MockUserManager();
+            userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                       .Returns(Task.FromResult(IdentityResult.Failed(null)));
+
+            var sut = new AccountController(userManager.Object, MockSignInManager().Object, MockRoleManager().Object);
+
+            var viewModel = new RegisterViewModel
+            {
+                Username = "TestUser",
+                Password = "TestPassword",
+                ConfirmPassword = "TestPassword"
+            };
+            var returnTo = "Index";
+
+            var result = sut.Register(viewModel, returnTo).Result;
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<RegisterViewModel>(viewResult.ViewData.Model);
+            Assert.Equal("TestUser", model.Username);
+            Assert.Equal("TestPassword", model.Password);
+            Assert.Equal("TestPassword", model.ConfirmPassword);
+        }
+
+        [Fact]
+        public void InvalidRegistrationReturnsView()
+        {
+            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            sut.ModelState.AddModelError("Username", "Required");
+
+            var viewModel = new RegisterViewModel
+            {
+                Username = null,
+                Password = "12345",
+                ConfirmPassword = "12345"
+            };
+            var returnTo = "Index";
+
+            var result = sut.Register(viewModel, returnTo).Result;
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<RegisterViewModel>(viewResult.ViewData.Model);
+            Assert.Null(model.Username);
+            Assert.Equal("12345", model.Password);
+            Assert.Equal("12345", model.ConfirmPassword);
+            Assert.Single(viewResult.ViewData.ModelState);
+        }
+
+        [Fact]
+        public void ValidRegistrationAddedUserToUsersRole()
+        {
+            var userManager = MockUserManager();
+            userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                       .Returns(Task.FromResult(IdentityResult.Success));
+            userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")))
+                        .Returns(Task.FromResult(IdentityResult.Success));
+            var roleManager = MockRoleManager();
+            roleManager.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == "User")))
+                        .Returns(Task.FromResult(new ApplicationRole
+                        {
+                            Id = "User",
+                            Name = "User"
+                        }));
+
+            var sut = new AccountController(userManager.Object, MockSignInManager().Object, roleManager.Object);
+
+            var viewModel = new RegisterViewModel
+            {
+                Username = "TestUser",
+                Password = "TestPassword",
+                ConfirmPassword = "TestPassword"
+            };
+
+            var result = sut.Register(viewModel).Result;
+
+            roleManager.Verify(x => x.FindByIdAsync(It.Is<string>(y => y == "User")), Times.Once);
+            roleManager.Verify(x => x.FindByIdAsync(It.Is<string>(y => y == "Admin")), Times.Never);
+            userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")), Times.Once);
+            userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "Admin")), Times.Never);
+        }
+
+        [Fact]
+        public void ValidAdminRegistrationAddedUserToUsersAndAdminRole()
+        {
+            var userManager = MockUserManager();
+            userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
+                       .Returns(Task.FromResult(IdentityResult.Success));
+            userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")))
+                        .Returns(Task.FromResult(IdentityResult.Success));
+            userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "Admin")))
+                        .Returns(Task.FromResult(IdentityResult.Success));
+            var roleManager = MockRoleManager();
+            roleManager.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == "User")))
+                        .Returns(Task.FromResult(new ApplicationRole
+                        {
+                            Id = "User",
+                            Name = "User"
+                        }));
+            roleManager.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == "Admin")))
+                        .Returns(Task.FromResult(new ApplicationRole
+                        {
+                            Id = "Admin",
+                            Name = "Admin"
+                        }));
+
+            var sut = new AccountController(userManager.Object, MockSignInManager().Object, roleManager.Object);
+
+            var viewModel = new RegisterViewModel
+            {
+                Username = "TestUser.Admin",
+                Password = "TestPassword",
+                ConfirmPassword = "TestPassword"
+            };
+
+            var result = sut.Register(viewModel).Result;
+
+            roleManager.Verify(x => x.FindByIdAsync(It.Is<string>(y => y == "User")), Times.Once);
+            roleManager.Verify(x => x.FindByIdAsync(It.Is<string>(y => y == "Admin")), Times.Once);
+            userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")), Times.Once);
+            userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "Admin")), Times.Once);
+        }
+
+
+        #region FakeHelpers
         private Mock<UserManager<ApplicationUser>> MockUserManager(IUserStore<ApplicationUser> userStore = null)
         {
             userStore = userStore ?? new Mock<IUserStore<ApplicationUser>>().Object;
@@ -145,5 +302,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
             roleStore = roleStore ?? new Mock<IRoleStore<ApplicationRole>>().Object;
             return new Mock<RoleManager<ApplicationRole>>(roleStore, null, null, null, null);
         }
+
+        #endregion
     }
 }
