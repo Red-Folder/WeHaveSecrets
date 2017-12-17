@@ -43,6 +43,8 @@ namespace WeHaveSecrets.Controllers
         [HttpPost]
         public async Task<IActionResult> SecretsFor(string userName)
         {
+            if (userName == null) throw new ArgumentNullException(nameof(userName));
+
             var model = new SecretsForViewModel();
             if (ModelState.IsValid)
             {
@@ -64,7 +66,6 @@ namespace WeHaveSecrets.Controllers
                 }
             }
 
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -79,6 +80,10 @@ namespace WeHaveSecrets.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword([FromServices]IUserPasswordStore<ApplicationUser> passwordStore, string userName, string newPassword)
         {
+            if (passwordStore == null) throw new ArgumentNullException(nameof(passwordStore));
+            if (userName == null) throw new ArgumentNullException(nameof(userName));
+            if (newPassword == null) throw new ArgumentNullException(nameof(newPassword));
+
             var model = new ChangePasswordViewModel();
 
             if (ModelState.IsValid)
@@ -98,6 +103,8 @@ namespace WeHaveSecrets.Controllers
 
         public IActionResult BackupDatabase([FromServices]IDatabaseMaintenance databaseMaintenance)
         {
+            if (databaseMaintenance == null) throw new ArgumentNullException(nameof(databaseMaintenance));
+
             var model = new BackupsViewModel();
             if (databaseMaintenance.Backup())
             {

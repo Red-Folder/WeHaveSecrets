@@ -19,7 +19,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
     public class HomeControllerTests
     {
         [Fact]
-        public void IndexReturnsViewWithModel()
+        public void IndexReturnsView()
         {
             var sut = new HomeController();
 
