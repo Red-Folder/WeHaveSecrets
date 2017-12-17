@@ -10,6 +10,7 @@ using Moq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WeHaveSecrets.Models.AccountViewModels;
+using WeHaveSecrets.Tests.Unit.TestUtils;
 
 namespace WeHaveSecrets.Tests.Unit.Controllers
 {
@@ -19,7 +20,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         public async void ConstructorWithoutUserManagerThrowsArgumentExcaption()
         {
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new AccountController(null, MockSignInManager().Object, MockRoleManager().Object)
+                new AccountController(null, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object)
             ));
 
             Assert.Contains("userManager", ex.Message);
@@ -29,7 +30,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         public async void ConstructorWithoutSignInManagerThrowsArgumentExcaption()
         {
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new AccountController(MockUserManager().Object, null, MockRoleManager().Object)
+                new AccountController(IdentityMocks.UserManager().Object, null, IdentityMocks.RoleManager().Object)
             ));
 
             Assert.Contains("signInManager", ex.Message);
@@ -39,7 +40,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         public async void ConstructorWithoutRoleManagerThrowsArgumentExcaption()
         {
             var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Task.FromResult(
-                new AccountController(MockUserManager().Object, MockSignInManager().Object, null)
+                new AccountController(IdentityMocks.UserManager().Object, IdentityMocks.SignInManager().Object, null)
             ));
 
             Assert.Contains("roleManager", ex.Message);
@@ -48,10 +49,10 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void LoginReturnsView()
         {
-            var signInManager = MockSignInManager();
+            var signInManager = IdentityMocks.SignInManager();
             signInManager.Setup(x => x.SignOutAsync()).Returns(Task.CompletedTask);
 
-            var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, signInManager.Object, IdentityMocks.RoleManager().Object);
             var result = sut.Login().Result;
             Assert.IsType<ViewResult>(result);
         }
@@ -59,13 +60,13 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void ValidLoginReturnsRedirect()
         {
-            var signInManager = MockSignInManager();
+            var signInManager = IdentityMocks.SignInManager();
             signInManager.Setup(x => x.PasswordSignInAsync(It.IsAny<string>(),
                                                             It.IsAny<string>(),
                                                             It.IsAny<bool>(),
                                                             It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Success));
 
-            var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, signInManager.Object, IdentityMocks.RoleManager().Object);
 
             var viewModel = new LoginViewModel();
             var returnTo = "Index";
@@ -79,13 +80,13 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void FailedLoginReturnsView()
         {
-            var signInManager = MockSignInManager();
+            var signInManager = IdentityMocks.SignInManager();
             signInManager.Setup(x => x.PasswordSignInAsync(It.IsAny<string>(),
                                                             It.IsAny<string>(),
                                                             It.IsAny<bool>(),
                                                             It.IsAny<bool>())).Returns(Task.FromResult(Microsoft.AspNetCore.Identity.SignInResult.Failed));
 
-            var sut = new AccountController(MockUserManager().Object, signInManager.Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, signInManager.Object, IdentityMocks.RoleManager().Object);
 
             var viewModel = new LoginViewModel
             {
@@ -105,7 +106,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void InvalidLoginReturnsView()
         {
-            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object);
             sut.ModelState.AddModelError("Username", "Required");
 
             var viewModel = new LoginViewModel
@@ -127,7 +128,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void RegisterReturnsView()
         {
-            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object);
             var result = sut.Login().Result;
             Assert.IsType<ViewResult>(result);
         }
@@ -135,11 +136,11 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void ValidRegistrtionReturnsRedirect()
         {
-            var userManager = MockUserManager();
+            var userManager = IdentityMocks.UserManager();
             userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                        .Returns(Task.FromResult(IdentityResult.Success));
 
-            var sut = new AccountController(userManager.Object, MockSignInManager().Object, MockRoleManager().Object);
+            var sut = new AccountController(userManager.Object, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object);
 
             var viewModel = new RegisterViewModel
             {
@@ -158,11 +159,11 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void FailedRegistrationReturnsView()
         {
-            var userManager = MockUserManager();
+            var userManager = IdentityMocks.UserManager();
             userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                        .Returns(Task.FromResult(IdentityResult.Failed(null)));
 
-            var sut = new AccountController(userManager.Object, MockSignInManager().Object, MockRoleManager().Object);
+            var sut = new AccountController(userManager.Object, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object);
 
             var viewModel = new RegisterViewModel
             {
@@ -184,7 +185,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void InvalidRegistrationReturnsView()
         {
-            var sut = new AccountController(MockUserManager().Object, MockSignInManager().Object, MockRoleManager().Object);
+            var sut = new AccountController(IdentityMocks.UserManager().Object, IdentityMocks.SignInManager().Object, IdentityMocks.RoleManager().Object);
             sut.ModelState.AddModelError("Username", "Required");
 
             var viewModel = new RegisterViewModel
@@ -208,12 +209,12 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void ValidRegistrationAddedUserToUsersRole()
         {
-            var userManager = MockUserManager();
+            var userManager = IdentityMocks.UserManager();
             userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                        .Returns(Task.FromResult(IdentityResult.Success));
             userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")))
                         .Returns(Task.FromResult(IdentityResult.Success));
-            var roleManager = MockRoleManager();
+            var roleManager = IdentityMocks.RoleManager();
             roleManager.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == "User")))
                         .Returns(Task.FromResult(new ApplicationRole
                         {
@@ -221,7 +222,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
                             Name = "User"
                         }));
 
-            var sut = new AccountController(userManager.Object, MockSignInManager().Object, roleManager.Object);
+            var sut = new AccountController(userManager.Object, IdentityMocks.SignInManager().Object, roleManager.Object);
 
             var viewModel = new RegisterViewModel
             {
@@ -241,14 +242,14 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
         [Fact]
         public void ValidAdminRegistrationAddedUserToUsersAndAdminRole()
         {
-            var userManager = MockUserManager();
+            var userManager = IdentityMocks.UserManager();
             userManager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>()))
                        .Returns(Task.FromResult(IdentityResult.Success));
             userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")))
                         .Returns(Task.FromResult(IdentityResult.Success));
             userManager.Setup(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "Admin")))
                         .Returns(Task.FromResult(IdentityResult.Success));
-            var roleManager = MockRoleManager();
+            var roleManager = IdentityMocks.RoleManager();
             roleManager.Setup(x => x.FindByIdAsync(It.Is<string>(y => y == "User")))
                         .Returns(Task.FromResult(new ApplicationRole
                         {
@@ -262,7 +263,7 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
                             Name = "Admin"
                         }));
 
-            var sut = new AccountController(userManager.Object, MockSignInManager().Object, roleManager.Object);
+            var sut = new AccountController(userManager.Object, IdentityMocks.SignInManager().Object, roleManager.Object);
 
             var viewModel = new RegisterViewModel
             {
@@ -278,31 +279,5 @@ namespace WeHaveSecrets.Tests.Unit.Controllers
             userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "User")), Times.Once);
             userManager.Verify(x => x.AddToRoleAsync(It.IsAny<ApplicationUser>(), It.Is<string>(y => y == "Admin")), Times.Once);
         }
-
-
-        #region FakeHelpers
-        private Mock<UserManager<ApplicationUser>> MockUserManager(IUserStore<ApplicationUser> userStore = null)
-        {
-            userStore = userStore ?? new Mock<IUserStore<ApplicationUser>>().Object;
-            return new Mock<UserManager<ApplicationUser>>(userStore, null, null, null, null, null, null, null, null);
-        }
-
-        private Mock<SignInManager<ApplicationUser>> MockSignInManager(UserManager<ApplicationUser> userManager = null,
-                                                                 IHttpContextAccessor httpContextAccessor = null,
-                                                                 IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory = null)
-        {
-            userManager = userManager ?? MockUserManager().Object;
-            httpContextAccessor = httpContextAccessor ?? new Mock<IHttpContextAccessor>().Object;
-            userClaimsPrincipalFactory = userClaimsPrincipalFactory ?? new Mock<IUserClaimsPrincipalFactory<ApplicationUser>>().Object;
-            return new Mock<SignInManager<ApplicationUser>>(userManager, httpContextAccessor, userClaimsPrincipalFactory, null, null, null);
-        }
-
-        private Mock<RoleManager<ApplicationRole>> MockRoleManager(IRoleStore<ApplicationRole> roleStore = null)
-        {
-            roleStore = roleStore ?? new Mock<IRoleStore<ApplicationRole>>().Object;
-            return new Mock<RoleManager<ApplicationRole>>(roleStore, null, null, null, null);
-        }
-
-        #endregion
     }
 }

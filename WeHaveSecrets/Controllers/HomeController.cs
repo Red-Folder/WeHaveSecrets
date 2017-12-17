@@ -27,16 +27,18 @@ namespace WeHaveSecrets.Controllers
         [HttpPost]
         public IActionResult AddTestimonial([FromServices]UserManager<ApplicationUser> userManager,
                                             [FromServices]ISocialProof socialProof, 
-                                            NewTestimonialViewModel vm)
+                                            NewTestimonialViewModel testimonial)
         {
-            if (socialProof == null) throw new ArgumentNullException("socialProof");
+            if (userManager == null) throw new ArgumentNullException(nameof(userManager));
+            if (socialProof == null) throw new ArgumentNullException(nameof(socialProof));
+            if (testimonial == null) throw new ArgumentNullException(nameof(testimonial));
 
             if (ModelState.IsValid)
             {
                 var domain = new Testimonial
                 {
                     UserId = userManager.GetUserId(User),
-                    Comment = vm.Comment,
+                    Comment = testimonial.Comment,
                     Created = DateTime.Now
                 };
                 socialProof.Save(domain);
