@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  teamcity-server:
+    image: jetbrains/teamcity-server
+    ports:
+     - "8111:8111"
+    #volumes:
+    # - c:\docker\secrets\teamcity\data:/data/teamcity_server/datadir
+    # - c:\docker\secrets\teamcity\logs:/opt/teamcity/logs
+    networks:
+      secrets-network:
+        ipv4_address: 172.20.0.20
+
+  teamcity-agent1:
+    image: jkleczkowski/teamcity-agent-dotnet-core
+    environment:
+      SERVER_URL: http://teamcity-server:8111
+      AGENT_NAME: agent1
+    volumes:
+     - c:\docker\secrets\teamcity\agent1:/data/teamcity_agent/conf
+     - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      secrets-network:
+        ipv4_address: 172.20.0.21
+
+networks:
+  secrets-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
