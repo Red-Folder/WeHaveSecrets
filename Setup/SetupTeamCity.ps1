@@ -28,7 +28,7 @@ while ($continue) {
 Write-Host 'TeamCity - Creating VCS - WeHaveSecretsCode'
 Add-TeamCityVcs -id 'WeHaveSecretsCode' -url 'https://github.com/Red-Folder/WeHaveSecrets.git'
 Write-Host 'TeamCity - Creating VCS - WeHaveSecretsConfig'
-Add-TeamCityVcs -id 'WeHaveSecretsConfig' -url 'https://github.com/Red-Folder/TestRepo.git'
+Add-TeamCityVcs -id 'WeHaveSecretsConfig' -url 'https://github.com/Red-Folder/WeHaveSecrets-TeamCityConfig.git'
 Write-Host 'TeamCity - Creating Project - WeHaveSecrets'
 Add-TeamCityProject 'WeHaveSecrets'
 Write-Host 'TeamCity - Setting Project source control'
