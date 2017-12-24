@@ -25,8 +25,7 @@ namespace WeHaveSecrets
             Configuration = configuration;
 
             _backupFolder = "/backups";
-            //_backupPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "backups");
-            _backupPath = Path.Combine(Directory.GetCurrentDirectory(), "backups");
+            _backupPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "backups");
         }
 
         public IConfiguration Configuration { get; }
@@ -101,18 +100,18 @@ namespace WeHaveSecrets
 
             app.UseStaticFiles();
 
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(_backupPath),
-                ServeUnknownFileTypes = true,
-                RequestPath = new PathString(_backupFolder)
-            });
+            //app.UseStaticFiles(new StaticFileOptions()
+            //{
+            //    FileProvider = new PhysicalFileProvider(_backupPath),
+            //    ServeUnknownFileTypes = true,
+            //    RequestPath = new PathString(_backupFolder)
+            //});
 
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
-            {
-                FileProvider = new PhysicalFileProvider(_backupPath),
-                RequestPath = new PathString(_backupFolder)
-            });
+            //app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            //{
+            //    FileProvider = new PhysicalFileProvider(_backupPath),
+            //    RequestPath = new PathString(_backupFolder)
+            //});
 
             app.UseAuthentication();
 
