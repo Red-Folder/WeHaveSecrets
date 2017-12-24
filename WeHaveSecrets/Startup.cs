@@ -25,7 +25,8 @@ namespace WeHaveSecrets
             Configuration = configuration;
 
             _backupFolder = "/backups";
-            _backupPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "backups");
+            //_backupPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "backups");
+            _backupPath = Path.Combine(Directory.GetCurrentDirectory(), "backups");
         }
 
         public IConfiguration Configuration { get; }
