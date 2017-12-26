@@ -100,18 +100,23 @@ namespace WeHaveSecrets
 
             app.UseStaticFiles();
 
-            //app.UseStaticFiles(new StaticFileOptions()
-            //{
-            //    FileProvider = new PhysicalFileProvider(_backupPath),
-            //    ServeUnknownFileTypes = true,
-            //    RequestPath = new PathString(_backupFolder)
-            //});
+            if (!Directory.Exists(_backupPath))
+            {
+                Directory.CreateDirectory(_backupPath);
+            }
 
-            //app.UseDirectoryBrowser(new DirectoryBrowserOptions()
-            //{
-            //    FileProvider = new PhysicalFileProvider(_backupPath),
-            //    RequestPath = new PathString(_backupFolder)
-            //});
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(_backupPath),
+                ServeUnknownFileTypes = true,
+                RequestPath = new PathString(_backupFolder)
+            });
+
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                FileProvider = new PhysicalFileProvider(_backupPath),
+                RequestPath = new PathString(_backupFolder)
+            });
 
             app.UseAuthentication();
 
