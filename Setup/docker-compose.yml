@@ -18,7 +18,7 @@ services:
       SERVER_URL: http://teamcity-server:8111
       AGENT_NAME: agent1
     volumes:
-     - c:\docker\secrets\teamcity\agent1:/data/teamcity_agent/conf
+    # - c:\docker\secrets\teamcity\agent1:/data/teamcity_agent/conf
      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       secrets-network:
@@ -31,6 +31,8 @@ services:
     environment:
       ACCEPT_EULA: Y
       SA_PASSWORD: AbC!23hgAAA
+    volumes:
+     - c:\tmp\wehavesecrets\backups:/app/wwwroot/backups
     networks:
       secrets-network:
         ipv4_address: 172.20.0.22
