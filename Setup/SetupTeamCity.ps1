@@ -17,7 +17,8 @@ if (-not (Test-Path $workingFolder)) {
     Write-Host 'Creating folder: $workingFolder'
     New-Item -Force -ItemType directory -Path $workingFolder
 }
-$env:WEHAVESECRETS_WORKINGFOLDER = $workingFolder
+$env:WEHAVESECRETS_WORKINGFOLDER = "/" + ($workingFolder -replace "\\","/" -replace ":","")
+Write-Host $env:WEHAVESECRETS_WORKINGFOLDER
 
 $sqlPassword = Read-Host -prompt 'What password do you want to use for SQL Server [Ch@ng3M3!]'
 if ([string]::IsNullOrEmpty($sqlPassword)) {

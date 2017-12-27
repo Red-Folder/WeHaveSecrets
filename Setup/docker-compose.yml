@@ -31,7 +31,7 @@ services:
       ACCEPT_EULA: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
       SA_PASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
     volumes:
-     - ${WEHAVESECRETS_WORKINGFOLDER}\backups:/app/wwwroot/backups
+     - ${WEHAVESECRETS_WORKINGFOLDER}/backups:/app/wwwroot/backups
     networks:
       secrets-network:
         ipv4_address: 172.20.0.22
