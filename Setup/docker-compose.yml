@@ -5,9 +5,6 @@ services:
     image: jetbrains/teamcity-server
     ports:
      - "8111:8111"
-    #volumes:
-    # - c:\docker\secrets\teamcity\data:/data/teamcity_server/datadir
-    # - c:\docker\secrets\teamcity\logs:/opt/teamcity/logs
     networks:
       secrets-network:
         ipv4_address: 172.20.0.20
@@ -17,8 +14,10 @@ services:
     environment:
       SERVER_URL: http://teamcity-server:8111
       AGENT_NAME: agent1
+      WEHAVESECRETS_WORKINGFOLDER: ${WEHAVESECRETS_WORKINGFOLDER}
+      WEHAVESECRETS_SQLLOCALPORT: ${WEHAVESECRETS_SQLLOCALPORT}
+      WEHAVESECRETS_SQLPASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
     volumes:
-    # - c:\docker\secrets\teamcity\agent1:/data/teamcity_agent/conf
      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       secrets-network:
@@ -27,12 +26,12 @@ services:
   db:
     image: microsoft/mssql-server-linux:latest
     ports:
-      - 1433:1433
+      - ${WEHAVESECRETS_SQLLOCALPORT}:1433
     environment:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: AbC!23hgAAA
+      ACCEPT_EULA: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
+      SA_PASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
     volumes:
-     - c:\tmp\wehavesecrets\backups:/app/wwwroot/backups
+     - ${WEHAVESECRETS_WORKINGFOLDER}\backups:/app/wwwroot/backups
     networks:
       secrets-network:
         ipv4_address: 172.20.0.22

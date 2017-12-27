@@ -4,6 +4,48 @@
 Get-ChildItem -Path scripts\*.psm1 -File | % {Foreach-Object {Import-Module $_.FullName}}
 
 #############################################################################################
+# Get variables
+#############################################################################################
+Write-Host 'Hi.  This script will help you get up and running.'
+Write-Host 'First off, a few questions about how you want to configure the setup:'
+
+$workingFolder = Read-Host -prompt 'Where would you like to put docker working files? [c:\tmp\wehavesecrets]'
+if ([string]::IsNullOrEmpty($workingFolder)) {
+    $workingFolder = 'c:\tmp\wehavesecrets'
+}
+if (-not (Test-Path $workingFolder)) {
+    Write-Host 'Creating folder: $workingFolder'
+    New-Item -Force -ItemType directory -Path $workingFolder
+}
+$env:WEHAVESECRETS_WORKINGFOLDER = $workingFolder
+
+$sqlPassword = Read-Host -prompt 'What password do you want to use for SQL Server [Ch@ng3M3!]'
+if ([string]::IsNullOrEmpty($sqlPassword)) {
+    $sqlPassword = 'Ch@ng3M3!'
+}
+$env:WEHAVESECRETS_SQLPASSWORD = $sqlPassword
+
+$sqlLocalPort = Read-Host -prompt 'What local port do you want for SQL Server [1433]'
+if ([string]::IsNullOrEmpty($sqlLocalPort)) {
+    $sqlLocalPort = '1433'
+}
+$env:WEHAVESECRETS_SQLLOCALPORT = $sqlLocalPort
+
+$sqlLicenceAccepted = "N"
+while ($sqlLicenceAccepted -ne "Y") {
+    $sqlLicenceAccepted = Read-Host -prompt 'Do you accept the SQL Server licence (see https://hub.docker.com/r/microsoft/mssql-server-linux/) [Y/N]'
+    if ($sqlLicenceAccepted -eq "N") {
+        Write-Host 'Sorry that I have no non-SQL Server option at the moment.  If you would like one, please leave me a Github issue - if I get enough feedback, I will look at an alternative option'
+        exit
+    }
+    if ($sqlLicenceAccepted -ne "Y") {
+        Write-Host 'This project rerquires SQL Server to be used.  If you are unable to accept the licence, then this setup script will need to terminate'
+        Write-Host 'Available options: Y - Accept the licence, N - Do not accept licence (and terminate setup)'
+    }
+}
+$env:WEHAVESECRETS_SQLLICENCEACCEPTED = $sqlLicenceAccepted
+
+#############################################################################################
 # Setup TeamCity
 #############################################################################################
 Write-Host 'Starting the docker environment'
