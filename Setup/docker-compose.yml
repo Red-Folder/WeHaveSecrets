@@ -17,24 +17,13 @@ services:
       WEHAVESECRETS_WORKINGFOLDER: ${WEHAVESECRETS_WORKINGFOLDER}
       WEHAVESECRETS_SQLLOCALPORT: ${WEHAVESECRETS_SQLLOCALPORT}
       WEHAVESECRETS_SQLPASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
+      WEHAVESECRETS_SQLLICENCEACCEPTED: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       secrets-network:
         ipv4_address: 172.20.0.21
 
-  db:
-    image: microsoft/mssql-server-linux:latest
-    ports:
-      - ${WEHAVESECRETS_SQLLOCALPORT}:1433
-    environment:
-      ACCEPT_EULA: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
-      SA_PASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
-    volumes:
-     - ${WEHAVESECRETS_WORKINGFOLDER}/backups:/app/wwwroot/backups
-    networks:
-      secrets-network:
-        ipv4_address: 172.20.0.22
 networks:
   secrets-network:
     ipam:
