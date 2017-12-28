@@ -11,5 +11,6 @@ RUN npm install
 COPY cypress.json .
 COPY cypress cypress
 
-RUN $(npm bin)/cypress verify
-RUN $(npm bin)/cypress run
+RUN node_modules/.bin/cypress verify
+
+CMD ["node_modules/.bin/cypress", "run"]

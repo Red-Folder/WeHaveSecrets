@@ -1,6 +1,6 @@
 describe('As a SecretsRUs customer', function(){
     it('I should be able to register, and login', function(){
-        cy.visit('http://localhost:44353/')
+        cy.visit(Cypress.env('WEHAVESECRETS_URL'))
 
         let username = 'user' + (new Date()).toISOString().replace(/[^0-9]/g, "")
 
@@ -18,7 +18,7 @@ describe('As a SecretsRUs customer', function(){
     })
 
     it('I should be able to register, and add a secret, collect the link and then access anonymously', function(){
-        cy.visit('http://localhost:44353/')
+        cy.visit(Cypress.env('WEHAVESECRETS_URL'))
 
         let username = 'user' + (new Date()).toISOString().replace(/[^0-9]/g, "")
 
