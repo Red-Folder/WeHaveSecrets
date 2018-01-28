@@ -1,13 +1,51 @@
 version: '3'
 
 services:
+  web:
+    build: 
+      context: ../WeHaveSecrets
+    ports:
+      - 8080:80
+    volumes:
+      - ${WEHAVESECRETS_WORKINGFOLDER}/backups:/app/wwwroot/backups
+    environment:
+      "ConnectionStrings:DefaultConnection": "Server=db;Database=WeHaveSecrets;User Id=sa;Password=${WEHAVESECRETS_SQLPASSWORD};" 
+    depends_on:
+      - db
+
+  db:
+    image: microsoft/mssql-server-linux:latest
+    ports:
+      - ${WEHAVESECRETS_SQLLOCALPORT}:1433
+    volumes:
+      - ${WEHAVESECRETS_WORKINGFOLDER}/backups:/app/wwwroot/backups
+    environment:
+      ACCEPT_EULA: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
+      SA_PASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
+
+  db-setup:
+    build: 
+      context: ../Db.WeHaveSecrets
+    environment:
+      "CONNECTIONSTRING": "Server=db;Database=WeHaveSecrets;User Id=sa;Password=${WEHAVESECRETS_SQLPASSWORD};" 
+    depends_on:
+      - db
+
+  tests-end2end:
+    build: 
+      context: ../Cypress
+      dockerfile: Dockerfile.end2end
+    volumes:
+      - ${WEHAVESECRETS_WORKINGFOLDER}/end2end:/app/cypress/videos
+    environment:
+      CYPRESS_WEHAVESECRETS_URL: "http://web"
+    depends_on:
+      - web
+
   teamcity-server:
     image: jetbrains/teamcity-server
     ports:
      - "8111:8111"
-    networks:
-      secrets-network:
-        ipv4_address: 172.20.0.20
 
   teamcity-agent1:
     image: jkleczkowski/teamcity-agent-dotnet-core
@@ -20,9 +58,8 @@ services:
       WEHAVESECRETS_SQLLICENCEACCEPTED: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      secrets-network:
-        ipv4_address: 172.20.0.21
+    depends_on:
+      - teamcity-server
 
 networks:
   secrets-network:

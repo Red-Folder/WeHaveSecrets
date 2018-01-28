@@ -50,7 +50,7 @@ $env:WEHAVESECRETS_SQLLICENCEACCEPTED = $sqlLicenceAccepted
 # Setup TeamCity
 #############################################################################################
 Write-Host 'Starting the docker environment'
-Start-DockerEnvironment -project 'WeHaveSecrets'
+Start-TeamCity -project 'WeHaveSecrets'
 
 #############################################################################################
 # Setup TeamCity

@@ -1,4 +1,4 @@
-Function Start-DockerEnvironment {
+Function Start-TeamCity {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True,ValueFromPipeline=$False,ValueFromPipelineByPropertyName=$False)]
@@ -12,7 +12,8 @@ Function Start-DockerEnvironment {
     
     Process
     {
-        docker-compose -p ${project} up -d
+        docker-compose -p ${project} up -d teamcity-server
+        docker-compose -p ${project} up -d teamcity-agent1        
     }
     
     End
