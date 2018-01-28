@@ -9,7 +9,10 @@ COPY package.json .
 RUN npm install
 
 COPY cypress.json .
-COPY cypress cypress
+COPY cypress/fixtures cypress/fixtures
+COPY cypress/plugins cypress/plugins
+COPY cypress/support cypress/support
+COPY cypress/integration/end2end_spec.js cypress/integration/end2end_spec.js
 
 RUN node_modules/.bin/cypress verify
 
