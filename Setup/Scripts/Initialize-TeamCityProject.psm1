@@ -1,4 +1,4 @@
-Function Await-TeamCityProjectRestored {
+Function Initialize-TeamCityProject {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True,ValueFromPipeline=$False,ValueFromPipelineByPropertyName=$False)]

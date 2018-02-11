@@ -36,7 +36,7 @@ $body = @"
         </properties>
 </vcs-root>
 "@
-        Invoke-RestMethod -Method POST -Headers $headers -Uri http://localhost:8111/app/rest/vcs-roots -ContentType application/xml -Body $body        
+        $result = Invoke-RestMethod -Method POST -Headers $headers -Uri http://localhost:8111/app/rest/vcs-roots -ContentType application/xml -Body $body
     }
     
     End

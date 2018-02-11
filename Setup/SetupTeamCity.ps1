@@ -15,10 +15,10 @@ if ([string]::IsNullOrEmpty($workingFolder)) {
 }
 if (-not (Test-Path $workingFolder)) {
     Write-Host 'Creating folder: $workingFolder'
-    New-Item -Force -ItemType directory -Path $workingFolder
+    New-Item -Force -ItemType directory -Path $workingFolder | Out-Null
 }
 $env:WEHAVESECRETS_WORKINGFOLDER = "/" + ($workingFolder -replace "\\","/" -replace ":","")
-Write-Host $env:WEHAVESECRETS_WORKINGFOLDER
+#Write-Host $env:WEHAVESECRETS_WORKINGFOLDER
 
 $sqlPassword = Read-Host -prompt 'What password do you want to use for SQL Server [Ch@ng3M3!]'
 if ([string]::IsNullOrEmpty($sqlPassword)) {
@@ -78,13 +78,14 @@ Write-Host 'TeamCity - Setting Project source control'
 Set-TeamCityProjectVersionSource -projectid 'WeHaveSecrets' -vcsid 'WeHaveSecretsConfig'
 
 Write-Host 'TeamCity - Waiting for project to be restored'
-Await-TeamCityProjectRestored -id 'WeHaveSecrets'
+Initialize-TeamCityProject -id 'WeHaveSecrets'
 
-Write-Host 'TeamCity - Authorising agent'
-Set-TeamCityAgentAuthorisation -id 'agent1'
+Write-Host 'TeamCity - Authorising agent (dotnet)'
+Set-TeamCityAgentAuthorisation -id 'dotnet'
+Write-Host 'TeamCity - Authorising agent (compose)'
+Set-TeamCityAgentAuthorisation -id 'compose'
+
 Write-Host 'TeamCity - Adding Project to default agent pool'
 Add-TeamCityProjectToDefaultPool -id 'WeHaveSecrets' -name 'WeHaveSecrets'
-
-
 
 Write-Host 'Ok, we are pretty much done'

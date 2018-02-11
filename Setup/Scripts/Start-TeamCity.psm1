@@ -13,7 +13,8 @@ Function Start-TeamCity {
     Process
     {
         docker-compose -p ${project} up -d teamcity-server
-        docker-compose -p ${project} up -d teamcity-agent1        
+        docker-compose -p ${project} up -d teamcity-agent-dotnet
+        docker-compose -p ${project} up -d teamcity-agent-compose        
     }
     
     End

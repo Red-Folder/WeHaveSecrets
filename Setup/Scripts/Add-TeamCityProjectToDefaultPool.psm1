@@ -19,7 +19,7 @@ $body = @"
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <project id="${id}" name="${name}"/>
 "@
-        Invoke-RestMethod -Method POST -Headers $headers -Uri http://localhost:8111/app/rest/agentPools/id:0/projects -ContentType application/xml -Body $body
+        $result = Invoke-RestMethod -Method POST -Headers $headers -Uri http://localhost:8111/app/rest/agentPools/id:0/projects -ContentType application/xml -Body $body
     }
     
     End

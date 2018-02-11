@@ -34,7 +34,7 @@ $body = @"
 </projectFeatures>
 "@
 
-        Invoke-RestMethod -Method PUT  -Headers $headers -Uri http://localhost:8111/app/rest/projects/${projectId}/projectFeatures -ContentType application/xml -Body $body
+        $result = Invoke-RestMethod -Method PUT  -Headers $headers -Uri http://localhost:8111/app/rest/projects/${projectId}/projectFeatures -ContentType application/xml -Body $body
     }
     
     End

@@ -15,7 +15,7 @@ Function Set-TeamCityAgentAuthorisation {
 
         $headers = New-TeamCityHeaders
 
-        Invoke-RestMethod -Method PUT -Headers $headers -Uri http://localhost:8111/app/rest/agents/${id}/authorized -Body "true"
+        $result = Invoke-RestMethod -Method PUT -Headers $headers -Uri http://localhost:8111/app/rest/agents/${id}/authorized -Body "true"
     }
     
     End

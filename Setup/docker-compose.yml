@@ -47,11 +47,11 @@ services:
     ports:
      - "8111:8111"
 
-  teamcity-agent1:
+  teamcity-agent-dotnet:
     image: jkleczkowski/teamcity-agent-dotnet-core
     environment:
       SERVER_URL: http://teamcity-server:8111
-      AGENT_NAME: agent1
+      AGENT_NAME: dotnet
       WEHAVESECRETS_WORKINGFOLDER: ${WEHAVESECRETS_WORKINGFOLDER}
       WEHAVESECRETS_SQLLOCALPORT: ${WEHAVESECRETS_SQLLOCALPORT}
       WEHAVESECRETS_SQLPASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
@@ -61,8 +61,17 @@ services:
     depends_on:
       - teamcity-server
 
-networks:
-  secrets-network:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+  teamcity-agent-compose:
+    image: redfolder/teamcity-agent-docker-compose
+    environment:
+      SERVER_URL: http://teamcity-server:8111
+      AGENT_NAME: compose
+      WEHAVESECRETS_WORKINGFOLDER: ${WEHAVESECRETS_WORKINGFOLDER}
+      WEHAVESECRETS_SQLLOCALPORT: ${WEHAVESECRETS_SQLLOCALPORT}
+      WEHAVESECRETS_SQLPASSWORD: ${WEHAVESECRETS_SQLPASSWORD}
+      WEHAVESECRETS_SQLLICENCEACCEPTED: ${WEHAVESECRETS_SQLLICENCEACCEPTED}
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - teamcity-server
+

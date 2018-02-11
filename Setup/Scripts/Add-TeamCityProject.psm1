@@ -15,7 +15,7 @@ Function Add-TeamCityProject {
 
         $headers = New-TeamCityHeaders
 
-        Invoke-RestMethod -Method POST  -Headers $headers -Uri http://localhost:8111/app/rest/projects -ContentType text/plain -Body $name  
+        $result = Invoke-RestMethod -Method POST  -Headers $headers -Uri http://localhost:8111/app/rest/projects -ContentType text/plain -Body $name
     }
     
     End
