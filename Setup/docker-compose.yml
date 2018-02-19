@@ -32,9 +32,7 @@ services:
       - db
 
   tests-end2end:
-    build: 
-      context: ../Cypress
-      dockerfile: Dockerfile.end2end
+    image: redfolder/wehavesecrets-end2endtests
     volumes:
       - ${WEHAVESECRETS_WORKINGFOLDER}/end2end:/app/cypress/videos
     environment:
