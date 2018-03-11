@@ -5,16 +5,58 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="row">
+        <div class="col-md-3">
+            <img src="~/images/Important.png" />
+        </div>
+        <div class="col-md-6">
+            <h2>
+                Like what we do?
+            </h2>
+            <p>
+                Leave us a testimonial.
+            </p>
+        </div>
+        <div class="col-md-3">
+            @await Html.PartialAsync("_AddTestimonial", new NewTestimonialViewModel())
+        </div>
+    </div>
+}
 
-<h2>WeHaveSecrets</h2>
 <div class="row">
     <div class="col-md-9">
-        TODO.  Make a lovely landing page extolling the virtues of WeHaveSecrets
+        <h2>Welcome to We Have Secrets</h2>
+        <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elementum finibus dolor in dictum. Mauris eget purus dui. Vivamus ornare pharetra quam et faucibus. Nunc dignissim dolor a orci tempor, quis interdum ipsum scelerisque. Etiam sit amet sem erat. Aliquam gravida lobortis massa. Aenean auctor felis sit amet iaculis ullamcorper. Duis ac sagittis odio, a semper tellus.
+        </p>
     </div>
     <div class="col-md-3">
-        @if (SignInManager.IsSignedIn(User))
-        {
-            @await Html.PartialAsync("_AddTestimonial", new NewTestimonialViewModel())
-        }
+        <img src="~/images/Safe-Have.png" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <img src="~/images/Key-Access-01.png" />
+    </div>
+    <div class="col-md-9">
+        <h2>Your secrets are important to us</h2>
+        <p>
+            Vestibulum sed lorem id risus imperdiet sodales. Sed bibendum tellus turpis. Morbi facilisis non ex venenatis iaculis. In a iaculis odio. Fusce vitae nibh molestie, feugiat arcu sit amet, consectetur risus. Sed orci eros, consequat ac dolor tincidunt, placerat cursus orci. In hac habitasse platea dictumst. Vestibulum quis metus nunc.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <h2>We are the safest place to keep your secrets</h2>
+        <p>
+            Aenean egestas dolor ut nunc elementum, et porta nisl cursus. Pellentesque at neque eget purus vehicula dapibus quis eu lorem. Duis tincidunt mauris mi, sed ullamcorper turpis scelerisque ac. Curabitur bibendum dui vitae erat lacinia tristique. Donec convallis suscipit nibh, sit amet posuere neque imperdiet a. Fusce lobortis lobortis purus nec semper. Nulla ipsum ipsum, ullamcorper in aliquet vitae, imperdiet at diam. Nunc leo nibh, sodales non sodales id, blandit nec purus. Praesent ullamcorper dignissim diam, sit amet lacinia nisi elementum sit amet.
+        </p>
+    </div>
+    <div class="col-md-3">
+        <img src="~/images/Data-Secure.png" />
     </div>
 </div>

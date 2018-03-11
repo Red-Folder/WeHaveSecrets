@@ -38,7 +38,7 @@ services:
     volumes:
       - ${WEHAVESECRETS_WORKINGFOLDER}/end2end:/app/cypress/videos
     environment:
-      CYPRESS_WEHAVESECRETS_URL: "http://web"
+      WEHAVESECRETS_URL: "http://web"
     depends_on:
       - web
 
