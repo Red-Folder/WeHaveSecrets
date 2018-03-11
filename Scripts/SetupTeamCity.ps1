@@ -1,7 +1,7 @@
 #############################################################################################
 # Import all modules
 #############################################################################################
-Get-ChildItem -Path scripts\*.psm1 -File | % {Foreach-Object {Import-Module $_.FullName}}
+Get-ChildItem -Path lib\*.psm1 -File | % {Foreach-Object {Import-Module $_.FullName}}
 
 #############################################################################################
 # Get variables
@@ -17,7 +17,7 @@ if (-not (Test-Path $workingFolder)) {
     Write-Host 'Creating folder: $workingFolder'
     New-Item -Force -ItemType directory -Path $workingFolder | Out-Null
 }
-$env:WEHAVESECRETS_WORKINGFOLDER = "/" + ($workingFolder -replace "\\","/" -replace ":","")
+$env:WEHAVESECRETS_WORKINGFOLDER = "/" + ($workingFolder -replace "\\", "/" -replace ":", "")
 #Write-Host $env:WEHAVESECRETS_WORKINGFOLDER
 
 $sqlPassword = Read-Host -prompt 'What password do you want to use for SQL Server [Ch@ng3M3!]'

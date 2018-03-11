@@ -32,11 +32,10 @@ services:
       - db
 
   tests-end2end:
-    build: 
-      context: ../Cypress
-      dockerfile: Dockerfile.end2end
+    image: redfolder/wehavesecrets-end2endtests
     volumes:
-      - ${WEHAVESECRETS_WORKINGFOLDER}/end2end:/app/cypress/videos
+      - ${WEHAVESECRETS_WORKINGFOLDER}/end2end/videos:/app/cypress/videos
+      - ${WEHAVESECRETS_WORKINGFOLDER}/end2end/screenshots:/app/cypress/screenshots
     environment:
       WEHAVESECRETS_URL: "http://web"
     depends_on:
